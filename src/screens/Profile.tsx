@@ -10,13 +10,29 @@ import { Input, Button,  } from '@rneui/themed';
 import { Text } from '@rneui/themed';
 import { Card } from '@rneui/themed';
 import CookieManager, {Cookie} from '@react-native-cookies/cookies';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
-import { Int32 } from 'react-native/Libraries/Types/CodegenTypes';
+import { useNavigation, NavigationProp, useNavigationContainerRef } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-function Profile(): React.JSX.Element {
+// Определите типы параметров для стека навигации
+type StackParamList = {
+  Profile: undefined;
+  AddSong: undefined;
+  // Добавьте здесь другие экраны, если необходимо
+};
+
+// Определите тип навигации для экрана Profile
+type ProfileScreenNavigationProp = NativeStackNavigationProp<StackParamList, 'Profile'>;
+
+function Profile(): React.JSX.Element{
     const [profile, setProfile] = useState("");
     const [songs, setSongs] = useState("");
     const [albums, setAlbums] = useState("");
+
+    const navigation = useNavigation<ProfileScreenNavigationProp>();
+
+      useEffect(() => {
+        getUserProfile();
+    }, []);
 
     let getUserProfile = () =>{
       console.log(CookieManager.getAll)
@@ -40,7 +56,7 @@ function Profile(): React.JSX.Element {
         );
     }
     
-    let getSongById = (id: Int32) =>{
+    let getSongById = (id: number) =>{
         console.log(CookieManager.getAll)
         const output = fetch(`http://10.0.2.2:8000/song/`, {
           method: 'GET',
@@ -62,7 +78,7 @@ function Profile(): React.JSX.Element {
           );
       }
 
-    let getAlbumById = (id: Int32) =>{
+    let getAlbumById = (id: number) =>{
         console.log(CookieManager.getAll)
         const output = fetch(`http://10.0.2.2:8000/album/`, {
           method: 'GET',
@@ -84,8 +100,6 @@ function Profile(): React.JSX.Element {
           );
       }
 
-    getUserProfile()
-
     const user_id = 5
 
     return (
@@ -106,6 +120,12 @@ function Profile(): React.JSX.Element {
               <Card.Title h3={true}>User Songs</Card.Title>
               <Card.Divider/>
               <Button onPress={() => getAlbumById(user_id)}>Update</Button>
+              <Text>{albums}</Text>
+            </Card>
+            <Card>        
+              <Card.Title h3={true}>Add Song</Card.Title>
+              <Card.Divider/>
+              <Button onPress={() => navigation.navigate("AddSong")}>Go to Add Song</Button>
               <Text>{albums}</Text>
             </Card>
         </ScrollView>

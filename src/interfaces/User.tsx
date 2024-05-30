@@ -1,5 +1,3 @@
-import { Int32 } from "react-native/Libraries/Types/CodegenTypes"
-
 interface UserCreate{
     email: string,
     password: string,
@@ -9,7 +7,7 @@ interface UserCreate{
 
 
 interface User extends UserCreate{
-    id: Int32,
+    id: number,
 
     is_active: boolean,
     is_superuser: boolean,
@@ -19,7 +17,7 @@ interface User extends UserCreate{
     first_name: string,
     last_name: string,
 
-    role: Int32,
+    role: number,
 
     city: string,
     bio: string,

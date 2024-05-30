@@ -5,10 +5,20 @@ import Feed from '../screens/Feed';
 import AddSong from '../screens/AddSong';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Player from '../screens/Player';
 
 const Tab= createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
+const ProfileNavigator = () =>{
+    return(
+        <Stack.Navigator>
+            <Stack.Screen name = 'Profile' component={Profile}/>
+            <Stack.Screen name = 'AddSong' component={AddSong} options={{ title: 'Upload a song' }}/>
+        </Stack.Navigator>
+    );
+}
 
 export const AppStack = () => {
   return (
@@ -19,12 +29,8 @@ export const AppStack = () => {
                 />
                 <Tab.Screen
                     name="Profile"
-                    component={Profile}
-                />
-                <Tab.Screen
-                    name="Add Song"
-                    component={AddSong}
-                />
+                    component={ProfileNavigator}>
+                </Tab.Screen>
         </Tab.Navigator>
   );
 };

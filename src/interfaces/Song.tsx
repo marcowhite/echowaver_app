@@ -1,5 +1,3 @@
-import { Int32 } from "react-native/Libraries/Types/CodegenTypes";
-
 interface SongAdd{
     name: string,
     description: string,
@@ -12,8 +10,8 @@ interface SongAdd{
 
 
 interface Song extends SongAdd{
-    id: Int32,
-    user_id: Int32,
+    id: number,
+    user_id: number,
     cover_file: string,
     audio_file: string,
 } 
