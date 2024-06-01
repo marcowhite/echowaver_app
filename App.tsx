@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Router } from './src/routes/Router';
-import { AuthProvider } from './src/contexts/Auth';
+import { AuthProvider } from './src/contexts/AuthContext';
 
 function App(): React.JSX.Element {
   // let cookies = CookieManager.get('http://10.0.2.2:8000/');

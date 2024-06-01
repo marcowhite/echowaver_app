@@ -15,31 +15,8 @@ export const AuthStack = () => {
   return (
     <Stack.Navigator
     initialRouteName="Login">
-        <Stack.Screen name="Login" component={Login}/>
+        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
         <Stack.Screen name="Registration" component={Register}/>
-</Stack.Navigator>
+    </Stack.Navigator>
   );
 };
-
-{/* <Tab.Navigator
-initialRouteName="Login"
-screenOptions={({ route }) => ({
-  tabBarIcon: ({ color, size }) => {
-    let iconName: string = '';
-
-    if (route.name === 'Login') {
-      iconName = 'log-in';
-    } else if (route.name === 'Registration') {
-      iconName = 'person-add';
-    } else {
-      // Provide a default icon name to avoid TypeScript error
-      iconName = 'alert-circle';
-    }
-
-    return <Ionicons name={iconName} size={size} color={color} />;
-  },
-})}
->
-    <Tab.Screen name="Login" component={Login}/>
-    <Tab.Screen name="Registration" component={Register}/>
-</Tab.Navigator> */}

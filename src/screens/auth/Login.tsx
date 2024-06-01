@@ -4,13 +4,18 @@ import {
   View,
   ScrollView,
   StyleSheet,
+  Image,
+
 } from 'react-native';
 
-import { Input, Button,  } from '@rneui/themed';
+import {   Button, Input} from '@rneui/themed';
 import { Text } from '@rneui/themed';
 import { Card } from '@rneui/themed';
 import CookieManager, {Cookie} from '@react-native-cookies/cookies';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+//import { Image } from '@rneui/base';
+import { postUserLogin } from '../../api';
 
 export type AuthStackParamList = {
   Login: undefined,
@@ -30,6 +35,7 @@ function Login(): React.JSX.Element {
       username: string;
       password: string;
     }  
+    
 
     let postUser = (user: UserLogin) => {
       var data = new URLSearchParams();
@@ -75,22 +81,34 @@ function Login(): React.JSX.Element {
         password: user.password,
        }))
     };
+
+    const toggleSecure = () => {
+      setSecure(!secure); // Toggle the visibility of the password
+    };
+
   
     return (
         <ScrollView>
             <Card>
+              <Card.Image style ={styles.image} source={require('../auth/enter.jpeg')}></Card.Image>
+            </Card>
+            <Card>
               <Card.Title h3={true}>Welcome to Echowaver!</Card.Title>
-              <Card.Title h4={true}>Echo your wave, share sound, discover new music. Connect with friends and artists. Dive into the wave of tunes!</Card.Title>
+              <Card.Title h4={true} style = {styles.welcomeText}>Echo your wave, share sound, discover new music. Connect with friends and artists. Dive into the wave of tunes!</Card.Title>
               <Card.Divider/>
-              <Input value={username} onChangeText={setUsername} placeholder="Email" />
-              <Input value={password} secureTextEntry = {!secure}  onChangeText={setPassword} placeholder="Password" />
-              <View style = {styles.container}>
-                <Switch value={secure} onValueChange={() => setSecure(!secure)}/>
-                <Text></Text>
+              <Input leftIcon = {<Ionicons size = {24} name ='mail'/>} value={username} onChangeText={setUsername} placeholder="Email" />
+              <Input leftIcon = {<Ionicons size = {24} name ='key'/>} value={password} secureTextEntry = {!secure}  onChangeText={setPassword} placeholder="Password" />
+              <View style={styles.eyeIconContainer}>
+                <Ionicons 
+                  name={secure ? 'eye-off' : 'eye'} 
+                  size={24} 
+                  color="gray" 
+                  onPress={toggleSecure} // Toggle password visibility onPress
+                />
               </View>
               <Button onPress={() => handleLogin(username, password)} title="Login" />
               <Card.Divider/>
-              <Button onPress={() => navigation.navigate('Registration')} title="Sign up" />
+              <Button type="outline" onPress={() => navigation.navigate('Registration')} title="Sign up" />
             </Card>
         </ScrollView>
     );
@@ -102,6 +120,21 @@ function Login(): React.JSX.Element {
       alignItems: 'center',
       justifyContent: 'center',
     },
+    image: {
+      borderRadius: 5,
+    },
+    welcomeText:{
+      color: 'gray',
+      marginTop: 1,
+    },
+    eyeIconContainer: {
+      position: 'absolute',
+      right: 17,
+      top: 290, // Adjust this value as needed to align with the password input
+    },
+    button:{
+      backgroundColor:'gray',
+    }
   });
 
 export default Login;

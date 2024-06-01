@@ -10,6 +10,7 @@ import { Input, Button,  } from '@rneui/themed';
 import { Text } from '@rneui/themed';
 import { Card } from '@rneui/themed';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export type AuthStackParamList = {
   Login: undefined,
@@ -70,19 +71,30 @@ function Register(): React.JSX.Element {
       };
       postUser(user);
     };
-  
+
+    const toggleSecure = () => {
+      setSecure(!secure); // Toggle the visibility of the password
+    };
+
     return (
         <ScrollView>
+            <Card>
+              <Card.Image style ={styles.image} source={require('../auth/signup.jpeg')}></Card.Image>
+            </Card>
             <Card>        
-              <Card.Title h3={true}>Register</Card.Title>
+              <Card.Title h3={true}>Sign Up!</Card.Title>
               <Card.Divider/>
-              <Input value={email} onChangeText={setEmail} placeholder="Email" />
-              <Input value={password} secureTextEntry = {!secure}  onChangeText={setPassword} placeholder="Password" />
-              <Input value={name} onChangeText={setName} placeholder="Name" />
-              <View style = {styles.container}>
-                <Switch value={secure} onValueChange={() => setSecure(!secure)}/>
-                <Text></Text>
+              <Input leftIcon = {<Ionicons size = {24} name ='mail'/>} value={email} onChangeText={setEmail} placeholder="Email" />
+              <Input leftIcon = {<Ionicons size = {24} name ='key'/>} value={password} secureTextEntry = {!secure}  onChangeText={setPassword} placeholder="Password" />
+              <View style={styles.eyeIconContainer}>
+                <Ionicons 
+                  name={secure ? 'eye-off' : 'eye'} 
+                  size={24} 
+                  color="gray" 
+                  onPress={toggleSecure} // Toggle password visibility onPress
+                />
               </View>
+              <Input leftIcon = {<Ionicons size = {24} name ='person'/>} value={name} onChangeText={setName} placeholder="Name" />
               <Button onPress={() => handleRegister(name, email, password)} title="Register" />
             </Card>
         </ScrollView>
@@ -90,10 +102,13 @@ function Register(): React.JSX.Element {
   }
 
   const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
+    eyeIconContainer: {
+      position: 'absolute',
+      right: 17,
+      top: 162, // Adjust this value as needed to align with the password input
+    },
+    image: {
+      borderRadius: 5,
     },
   });
 
