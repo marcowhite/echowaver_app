@@ -1,3 +1,9 @@
+import sendRequest from "../utils/request"
+
+export const getSongs = async (): Promise<any> => {
+    return sendRequest('song', 'GET');
+};
+
 export const getSongTags = async (): Promise<any> => {
     return sendRequest('song/tag', 'GET');
 };

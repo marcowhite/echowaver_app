@@ -13,15 +13,16 @@ import CookieManager, {Cookie} from '@react-native-cookies/cookies';
 import { useNavigation, NavigationProp, useNavigationContainerRef } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+
 // Определите типы параметров для стека навигации
 type StackParamList = {
-  Profile: undefined;
+  UserPage: undefined;
   AddSong: undefined;
   // Добавьте здесь другие экраны, если необходимо
 };
 
 // Определите тип навигации для экрана Profile
-type ProfileScreenNavigationProp = NativeStackNavigationProp<StackParamList, 'Profile'>;
+type ProfileScreenNavigationProp = NativeStackNavigationProp<StackParamList, 'UserPage'>;
 
 function Profile(): React.JSX.Element{
     const [profile, setProfile] = useState("");
@@ -107,6 +108,8 @@ function Profile(): React.JSX.Element{
             <Card>        
               <Card.Title h3={true}>Profile</Card.Title>
               <Card.Divider/>
+              <Button onPress={() => navigation.navigate("AddSong")}>Upload a new song</Button>
+              <Card.Divider/>
               <Button onPress={getUserProfile}>Update</Button>
               <Text>{profile}</Text>
             </Card>
@@ -125,7 +128,7 @@ function Profile(): React.JSX.Element{
             <Card>        
               <Card.Title h3={true}>Add Song</Card.Title>
               <Card.Divider/>
-              <Button onPress={() => navigation.navigate("AddSong")}>Go to Add Song</Button>
+              
               <Text>{albums}</Text>
             </Card>
         </ScrollView>

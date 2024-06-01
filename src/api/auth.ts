@@ -1,4 +1,5 @@
 import { UserLogin, UserRegister } from "./schemas";
+import sendRequest from "../utils/request"
 
 export const postUserRegister = async (userData: UserRegister): Promise<any> => {
     return sendRequest('user/auth/register', 'POST', {

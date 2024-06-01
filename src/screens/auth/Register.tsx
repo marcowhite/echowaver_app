@@ -9,7 +9,12 @@ import {
 import { Input, Button,  } from '@rneui/themed';
 import { Text } from '@rneui/themed';
 import { Card } from '@rneui/themed';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 
+export type AuthStackParamList = {
+  Login: undefined,
+  Registration: undefined,
+};
 
 function Register(): React.JSX.Element {
 
@@ -17,7 +22,7 @@ function Register(): React.JSX.Element {
     const [password, setPassword] = useState("")
     const [name, setName] = useState("")
     const [secure, setSecure] = useState(false)
-
+    const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
   
     interface UserRegister {
       name: string;
@@ -49,6 +54,7 @@ function Register(): React.JSX.Element {
         .then(
           (result) => {
             console.log(result);
+            navigation.navigate('Login')
           },
           (error) => {
             console.log(error);

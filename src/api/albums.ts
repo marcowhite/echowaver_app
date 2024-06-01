@@ -1,4 +1,5 @@
 import { AlbumAdd } from "./schemas";
+import sendRequest from "../utils/request"
 
 export const createAlbumForUser = async (userId: number, albumData: AlbumAdd): Promise<any> => {
     return sendRequest(`album/user/${userId}`, 'POST', albumData);

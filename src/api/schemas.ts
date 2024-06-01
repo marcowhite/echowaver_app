@@ -9,6 +9,7 @@ export interface AlbumAdd {
 export interface Album extends AlbumAdd {
     user_id: number;
     id: number;
+    cover_image: string;
 }
 
 export interface CountryAdd {

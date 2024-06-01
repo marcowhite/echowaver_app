@@ -1,3 +1,4 @@
+import sendRequest from "../utils/request"
 
 export const uploadImageFile = async (imageData: FormData): Promise<any> => {
     return sendRequest('file/upload/image', 'POST', imageData);

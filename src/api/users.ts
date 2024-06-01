@@ -1,4 +1,5 @@
 import { User } from "./schemas";
+import sendRequest from "../utils/request"
 
 export const getUserRoles = async (): Promise<any> => {
     return sendRequest('user/role', 'GET');

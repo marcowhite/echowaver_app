@@ -10,13 +10,22 @@ import { Input, Button,  } from '@rneui/themed';
 import { Text } from '@rneui/themed';
 import { Card } from '@rneui/themed';
 import CookieManager, {Cookie} from '@react-native-cookies/cookies';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+
+export type AuthStackParamList = {
+  Login: undefined,
+  Registration: undefined,
+};
+
 
 function Login(): React.JSX.Element {
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [secure, setSecure] = useState(false)
-  
+
+    const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
+
     interface UserLogin {
       username: string;
       password: string;
@@ -69,8 +78,9 @@ function Login(): React.JSX.Element {
   
     return (
         <ScrollView>
-            <Card>        
-              <Card.Title h3={true}>Login</Card.Title>
+            <Card>
+              <Card.Title h3={true}>Welcome to Echowaver!</Card.Title>
+              <Card.Title h4={true}>Echo your wave, share sound, discover new music. Connect with friends and artists. Dive into the wave of tunes!</Card.Title>
               <Card.Divider/>
               <Input value={username} onChangeText={setUsername} placeholder="Email" />
               <Input value={password} secureTextEntry = {!secure}  onChangeText={setPassword} placeholder="Password" />
@@ -79,6 +89,8 @@ function Login(): React.JSX.Element {
                 <Text></Text>
               </View>
               <Button onPress={() => handleLogin(username, password)} title="Login" />
+              <Card.Divider/>
+              <Button onPress={() => navigation.navigate('Registration')} title="Sign up" />
             </Card>
         </ScrollView>
     );

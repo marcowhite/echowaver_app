@@ -22,3 +22,5 @@ const sendRequest = async (path: string, method: string, data?: any): Promise<an
         throw error;
     }
 };
+
+export default sendRequest
