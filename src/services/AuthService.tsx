@@ -1,27 +1,52 @@
+import CookieManager, { Cookie } from "@react-native-cookies/cookies";
+
 export type AuthData = {
     token: string;
     email: string;
-    name: string;
-  };
-  const signIn = (email: string, _password: string): Promise<AuthData> => {
-    // this is a mock of an API call, in a real app
-    // will be need connect with some real API,
-    // send email and password, and if credential is corret
-    //the API will resolve with some token and another datas as the below
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          token: JWTTokenMock,
-          email: email,
-          name: 'Lucas Garcez',
+    cookie_name: string;
+};
+
+const signIn = async (email: string, _password: string): Promise<AuthData> => {
+    var data = new URLSearchParams();
+    data.append('username', email);
+    data.append('password', _password);
+
+    try {
+        const response = await fetch(`http://10.0.2.2:8000/user/auth/jwt/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: data.toString(),
         });
-      }, 1000);
-    });
-  };
-  
-  export const authService = {
+
+        if (!response.ok) {
+            throw new Error('Invalid username or password');
+        }
+
+        const headers = response.headers;
+        const unparsedCookie = headers.get('set-cookie') || "";
+        const myCookie = unparsedCookie.split(';')[0];
+        const [parsedName, parsedValue] = myCookie.split('=');
+
+        const cookie: Cookie = {
+            name: parsedName,
+            value: parsedValue,
+        };
+
+        await CookieManager.set('http://10.0.2.2:8000/', cookie);
+
+        return {
+            token: parsedValue,
+            email: email,
+            cookie_name: parsedName,
+        };
+    } catch (error) {
+        console.error('Error during login:', error);
+        throw error;
+    }
+};
+
+export const authService = {
     signIn,
-  };
-  
-  const JWTTokenMock =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikx1Y2FzIEdhcmNleiIsImlhdCI6MTUxNjIzOTAyMn0.oK5FZPULfF-nfZmiumDGiufxf10Fe2KiGe9G5Njoa64';
+};

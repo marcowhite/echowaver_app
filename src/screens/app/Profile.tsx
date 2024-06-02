@@ -12,6 +12,7 @@ import { Card } from '@rneui/themed';
 import CookieManager, {Cookie} from '@react-native-cookies/cookies';
 import { useNavigation, NavigationProp, useNavigationContainerRef } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useAuth } from '../../contexts/AuthContext';
 
 
 // Определите типы параметров для стека навигации
@@ -28,7 +29,7 @@ function Profile(): React.JSX.Element{
     const [profile, setProfile] = useState("");
     const [songs, setSongs] = useState("");
     const [albums, setAlbums] = useState("");
-
+    const {signOut} = useAuth();
     const navigation = useNavigation<ProfileScreenNavigationProp>();
 
       useEffect(() => {
@@ -125,12 +126,7 @@ function Profile(): React.JSX.Element{
               <Button onPress={() => getAlbumById(user_id)}>Update</Button>
               <Text>{albums}</Text>
             </Card>
-            <Card>        
-              <Card.Title h3={true}>Add Song</Card.Title>
-              <Card.Divider/>
-              
-              <Text>{albums}</Text>
-            </Card>
+            <Button onPress={signOut}>Logout</Button>
         </ScrollView>
     );
   }
