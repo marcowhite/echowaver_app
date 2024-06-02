@@ -4,12 +4,12 @@ export interface AlbumAdd {
     is_public: boolean;
     album_type_id: number;
     song_order: string;
+    cover_file: string;
 }
 
 export interface Album extends AlbumAdd {
     user_id: number;
     id: number;
-    cover_image: string;
 }
 
 export interface CountryAdd {
@@ -34,6 +34,23 @@ export interface Song extends SongAdd {
     user_id: number;
     cover_file: string;
     audio_file: string;
+}
+
+export interface UserProfile {
+    id: number;
+
+    display_name: string;
+    first_name: string;
+    last_name: string;
+    is_public: boolean;
+
+    city: string;
+    bio: string;
+
+    url: string;
+    avatar: string;
+    background: string;
+    spotlight: string;
 }
 
 export interface UserRegister {

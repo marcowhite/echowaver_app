@@ -1,7 +1,18 @@
 import sendRequest from "../utils/request"
+import { SongAdd } from "./schemas";
 
+export const postSong = async (albumData: SongAdd, audio_file: any, image_file: any): Promise<any> => {
+    return sendRequest(`song/`, 'POST', albumData);
+};
 export const getSongs = async (): Promise<any> => {
     return sendRequest('song', 'GET');
+};
+export const getSongById = async (songId: number): Promise<any> => {
+    return sendRequest(`song/${songId}`, 'GET');
+};
+
+export const getSongsByUserId = async (userId: number): Promise<any> => {
+    return sendRequest(`song/user/${userId}`, 'GET');
 };
 
 export const getSongTags = async (): Promise<any> => {

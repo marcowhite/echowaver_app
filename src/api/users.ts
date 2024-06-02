@@ -17,6 +17,10 @@ export const getUsers = async (): Promise<any> => {
     return sendRequest('user/auth/me', 'GET');
 };
 
+export const getUserProfile = async (userId: number): Promise<any> => {
+    return sendRequest(`user/profile/${userId}`, 'GET');
+};
+
 export const patchCurrentUser = async (userData: Partial<User>): Promise<any> => {
     return sendRequest('user/auth/me', 'PATCH', userData);
 };
