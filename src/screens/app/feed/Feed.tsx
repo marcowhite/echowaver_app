@@ -1,51 +1,63 @@
-// screens/Feed.tsx
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View, RefreshControl } from 'react-native';
 import { Button, Card, Text } from '@rneui/themed';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { getSongs, getAlbums, Song, Album } from '../../api';
-import SongListItem from '../../components/SongListItem';
-import AlbumCardItem from '../../components/AlbumCardItem'; // Import the new component
-import { usePlayer } from '../../contexts/PlayerContext';
+import { getSongs, getAlbums, Song, Album, UserProfile } from '../../../api';
+import SongListItem from '../../../components/SongListItem';
+import AlbumCardItem from '../../../components/AlbumCardItem'; // Import the new component
+import { usePlayer } from '../../../contexts/PlayerContext';
 
 export type RootStackParamList = {
   MainFeed: undefined;
   Player: undefined;
-  Profile: undefined;
   AddSong: undefined;
+  Profile: { profile: UserProfile | null };
+  FollowersOrFollowing: { profile: UserProfile; type: 'followers' | 'following' };
 };
 
 function Feed(): React.JSX.Element {
   const [songs, setSongs] = useState<Song[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { tracks, currentTrack, setCurrentTrack, setTracks } = usePlayer();
 
+  const fetchSongs = async () => {
+    try {
+      const songs = await getSongs();
+      setSongs(songs);
+    } catch (error) {
+      console.error('Failed to fetch songs', error);
+    }
+  };
+
+  const fetchAlbums = async () => {
+    try {
+      const albums = await getAlbums();
+      setAlbums(albums);
+    } catch (error) {
+      console.error('Failed to fetch albums', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchSongs = async () => {
-      try {
-        const songs = await getSongs();
-        setSongs(songs);
-      } catch (error) {
-        console.error('Failed to fetch songs', error);
-      }
-    };
-
-    const fetchAlbums = async () => {
-      try {
-        const albums = await getAlbums();
-        setAlbums(albums);
-      } catch (error) {
-        console.error('Failed to fetch albums', error);
-      }
-    };
-
     fetchSongs();
     fetchAlbums();
   }, []);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchSongs();
+    await fetchAlbums();
+    setRefreshing(false);
+  };
+
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <Card>
         <Card.Title h3={true}>Songs</Card.Title>
         <Card.Divider />

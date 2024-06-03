@@ -1,8 +1,11 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Image, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { usePlayer } from '../../contexts/PlayerContext';
+import { usePlayer } from '../../../contexts/PlayerContext';
+import { UserProfile, getUserProfile } from '../../../api';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from './Feed';
 
 const Player: React.FC = () => {
     const {
@@ -17,28 +20,42 @@ const Player: React.FC = () => {
         nextTrack,
         prevTrack,
         setCurrentDuration,
+        isLoading,
     } = usePlayer();
 
     if (!currentTrack) {
         return <Text>Loading...</Text>;
     }
 
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+
     useEffect(() => {
-        const interval = setInterval(() => {
-            if (isPlaying) {
-                setCurrentDuration(currentDuration + 1); // Увеличиваем текущую длительность на 1 секунду каждую секунду
+        const fetchProfile = async () => {
+            try {
+                const userProfile = await getUserProfile(currentTrack.user_id);
+                setProfile(userProfile);
+            } catch (error) {
+                console.error('Failed to fetch profile', error);
             }
-        }, 1000);
+        };
 
-        return () => clearInterval(interval);
-    }, [isPlaying, currentDuration, setCurrentDuration]);
+        fetchProfile();
+    }, [currentTrack.user_id]);
 
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     return (
         <View style={styles.container}>
-            <Image source={{ uri: `http://10.0.2.2:8000/file/image/${currentTrack.cover_file}` }} style={styles.coverImage} />
+            <View style={styles.coverImageContainer}>
+                <Image source={{ uri: `http://10.0.2.2:8000/file/image/${currentTrack.cover_file}` }} style={styles.coverImage} />
+                {isLoading && <View style={styles.overlay}>
+                    <ActivityIndicator style={styles.loadingIndicator} size="large" color="#ffffff" />
+                </View>}
+            </View>
             <View style={styles.trackInfo}>
                 <Text style={styles.trackTitle}>{currentTrack.name}</Text>
-                <Text style={styles.trackArtist}>{currentTrack.user_id}</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Profile', { profile })}>
+                    <Text style={styles.trackArtist}>{profile?.display_name}</Text>
+                </TouchableOpacity>
             </View>
             <Slider
                 style={styles.slider}
@@ -46,6 +63,7 @@ const Player: React.FC = () => {
                 maximumValue={totalDuration || 1}
                 value={currentDuration}
                 onValueChange={(value) => setCurrentDuration(value)}
+                onSlidingComplete={(value) => setCurrentDuration(value)}
                 disabled={!currentTrack}
             />
             <View style={styles.duration}>
@@ -97,15 +115,31 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 20,
     },
-    coverImage: {
+    coverImageContainer: {
+        position: 'relative',
         width: 250,
         height: 250,
-        borderRadius: 10,
         marginBottom: 20,
     },
-    playerControls: {
+    coverImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 10,
+    },
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.1)',
         alignItems: 'center',
-        marginBottom: 40,
+        justifyContent: 'center',
+        borderRadius: 10,
+    },
+    loadingIndicator: {
+        width: '100%',
+        height: '100%',
     },
     trackInfo: {
         alignItems: 'center',
@@ -119,7 +153,7 @@ const styles = StyleSheet.create({
     trackArtist: {
         fontSize: 14,
         textAlign: 'center',
-        color: 'gray',
+        color: 'blue',
     },
     controls: {
         flexDirection: 'row',

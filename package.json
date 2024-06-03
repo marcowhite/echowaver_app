@@ -19,6 +19,7 @@
     "@react-navigation/native-stack": "^6.9.26",
     "@rneui/base": "^4.0.0-rc.7",
     "@rneui/themed": "^4.0.0-rc.8",
+    "base64-js": "^1.5.1",
     "javascript-binary-converter": "^1.0.2",
     "react": "18.2.0",
     "react-native": "0.73.5",
@@ -27,7 +28,8 @@
     "react-native-safe-area-context": "^4.10.1",
     "react-native-screens": "^3.31.1",
     "react-native-sound": "^0.11.2",
-    "react-native-vector-icons": "^10.1.0"
+    "react-native-vector-icons": "^10.1.0",
+    "rn-fetch-blob": "^0.12.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
@@ -37,6 +39,7 @@
     "@react-native/eslint-config": "0.73.2",
     "@react-native/metro-config": "0.73.5",
     "@react-native/typescript-config": "0.73.1",
+    "@types/base-64": "^1.0.2",
     "@types/react": "^18.2.6",
     "@types/react-test-renderer": "^18.0.0",
     "babel-jest": "^29.6.3",

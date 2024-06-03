@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthData, authService } from '../services/AuthService';
 import CookieManager from '@react-native-cookies/cookies';
+import { User, getCurrentUser } from '../api';
 
 type AuthContextData = {
   authData?: AuthData;
@@ -39,15 +40,29 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       const _authData = await authService.signIn(username, password);
       setAuthData(_authData);
       await AsyncStorage.setItem('@AuthData', JSON.stringify(_authData));
+
+      const userProfile = await getCurrentUser(); // Замените на правильный путь получения профиля
+      await saveCurrentUser(userProfile);
+
     } catch (error) {
       console.error('Failed to sign in:', error);
       throw error;
     }
   };
 
+  const saveCurrentUser = async (user: User) => {
+    try {
+      const jsonValue = JSON.stringify(user);
+      await AsyncStorage.setItem('@current_user', jsonValue);
+    } catch (e) {
+      console.error('Failed to save the user to AsyncStorage', e);
+    }
+  };
+
   const signOut = async () => {
     setAuthData(undefined);
     await AsyncStorage.removeItem('@AuthData');
+    await AsyncStorage.removeItem('@current_user'); 
     await CookieManager.clearAll();
   };
 

@@ -1,19 +1,24 @@
 import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Button } from '@rneui/themed';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { User } from '../api';
+import { UserProfile } from '../api';
+import { RootStackParamList } from '../screens/app/feed/Feed';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 
 interface ProfileHeaderProps {
-  user: User;
+  user: UserProfile;
+  followers: number;
+  follows: number;
   isCurrentUser: boolean;
   isFollowing: boolean;
-  onEditProfile: () => void;
   onFollow: () => void;
   onUnfollow: () => void;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, isCurrentUser, isFollowing, onEditProfile, onFollow, onUnfollow }) => {
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, followers, follows, isCurrentUser, isFollowing, onFollow, onUnfollow }) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
   return (
     <View style={styles.container}>
       <Image source={ user.avatar === "null" ?  { uri: `http://10.0.2.2:8000/file/image/${user.avatar}` } : require("../components/default_user.jpg")} style={styles.avatar}/>
@@ -25,22 +30,24 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, isCurrentUser, isFo
         <Text style={styles.city}>{user.city}</Text>
       </View>
       <View style={styles.statsContainer}>
-        <View style={styles.stat}>
-          <Text style={styles.statNumber}>0</Text> 
-          <Text style={styles.statLabel}>Followers</Text>
-        </View>
-        <View style={styles.stat}>
-          <Text style={styles.statNumber}>0</Text> 
-          <Text style={styles.statLabel}>Follows</Text>
-        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('FollowersOrFollowing', { profile: user, type: 'followers' })}>
+          <View style={styles.stat}>
+            <Text style={styles.statNumber}>{followers}</Text>
+            <Text style={styles.statLabel}>Followers</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('FollowersOrFollowing', { profile: user, type: 'following' })}>
+          <View style={styles.stat}>
+            <Text style={styles.statNumber}>{follows}</Text>
+            <Text style={styles.statLabel}>Follows</Text>
+          </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
-        {isCurrentUser ? (
-          <Button onPress={onEditProfile} title="Edit Profile" />
-        ) : isFollowing ? (
-          <Button onPress={onUnfollow} title="Unfollow" />
+        {isCurrentUser ? null : isFollowing ? (
+          <Button onPress={onUnfollow} title="Unfollow" buttonStyle={styles.unfollowButton} />
         ) : (
-          <Button onPress={onFollow} title="Follow" />
+          <Button onPress={onFollow} title="Follow" buttonStyle={styles.followButton} />
         )}
       </View>
       <Text style={styles.bio}>{user.bio}</Text>
@@ -54,25 +61,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     marginBottom: 10,
+    borderWidth: 2,
+    borderColor: '#ddd',
   },
   infoContainer: {
     alignItems: 'center',
     marginBottom: 10,
   },
   displayName: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
+    color: '#333',
   },
   fullName: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#555',
   },
   city: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#777',
   },
   statsContainer: {
@@ -80,13 +90,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     width: '100%',
     marginBottom: 20,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+    paddingVertical: 10,
   },
   stat: {
     alignItems: 'center',
   },
   statNumber: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#333',
   },
   statLabel: {
     fontSize: 14,
@@ -97,9 +112,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 20,
   },
+  followButton: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+  },
+  unfollowButton: {
+    backgroundColor: '#F44336',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+  },
   bio: {
     textAlign: 'center',
     color: '#777',
+    fontSize: 14,
+    paddingHorizontal: 20,
   },
 });
 

@@ -1,7 +1,8 @@
 import React, { createContext, useState, useEffect, useRef, useContext, ReactNode } from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import Sound from 'react-native-sound';
-import {Song} from "../api"
-
+import RNFS from 'react-native-fs';
+import { Song } from '../api';
 
 type PlayerContextType = {
     tracks: Song[];
@@ -19,6 +20,7 @@ type PlayerContextType = {
     setTracks: (tracks: Song[]) => void;
     setCurrentTrack: (track: Song) => void;
     setCurrentDuration: (value: number) => void; // Добавлено
+    isLoading: boolean;
 };
 
 type PlayerProviderProps = {
@@ -35,6 +37,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     const [currentDuration, setCurrentDuration] = useState(0);
     const [totalDuration, setTotalDuration] = useState(0);
     const [volume, setVolume] = useState(1);
+    const [isLoading, setIsLoading] = useState(false);
     const playbackInstanceRef = useRef<Sound | null>(null);
 
     const updateTracks = (updatedTracks: Song[]) => {
@@ -46,27 +49,54 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     };
 
     const updateCurrentDuration = (value: number) => {
+        console.log(`Setting current duration to: ${value}`);
         setCurrentDuration(value);
+        if (sound) {
+            console.log(`Setting sound current time to: ${value}`);
+            sound.setCurrentTime(value);
+        }
     };
 
     useEffect(() => {
         if (currentTrack) {
             const fetchAudio = async () => {
+                setIsLoading(true); // Устанавливаем состояние загрузки
                 try {
-                    const response = await fetch(`http://10.0.2.2:8000/file/audio/${currentTrack.audio_file}`);
-                    const audioUrl = response.url;
-                    const newSound = new Sound(audioUrl, '', (error) => {
-                        if (error) {
-                            console.log('Failed to load the sound', error);
-                            return;
-                        }
-                        setTotalDuration(newSound.getDuration());
-                        setSound(newSound);
-                        playbackInstanceRef.current = newSound;
-                    });
+                    const filePath = `${RNFS.DocumentDirectoryPath}/${currentTrack.audio_file}`;
+                    const fileExists = await RNFS.exists(filePath);
+                    if (!fileExists) {
+                        console.log('Audio file not found in local storage, fetching from network');
+                        const response = await fetch(`http://10.0.2.2:8000/file/audio/${currentTrack.audio_file}`);
+                        const audioData = await response.blob();
+                        const reader = new FileReader();
+                        reader.onloadend = async () => {
+                            const base64data = reader.result as string;
+                            await RNFS.writeFile(filePath, base64data.split(',')[1], 'base64');
+                            console.log('Audio file saved locally');
+                            loadSound(filePath);
+                        };
+                        reader.readAsDataURL(audioData);
+                    } else {
+                        console.log('Audio file found in local storage');
+                        loadSound(filePath);
+                    }
                 } catch (error) {
                     console.error('Failed to fetch audio', error);
+                } finally {
+                    setIsLoading(false); // Сбрасываем состояние загрузки
                 }
+            };
+
+            const loadSound = (path: string) => {
+                const newSound = new Sound(path, '', (error) => {
+                    if (error) {
+                        console.log('Failed to load the sound', error);
+                        return;
+                    }
+                    setTotalDuration(newSound.getDuration());
+                    setSound(newSound);
+                    playbackInstanceRef.current = newSound;
+                });
             };
 
             fetchAudio();
@@ -81,14 +111,16 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
         if (!sound) return;
 
         if (isPlaying) {
-            sound.pause();
+            sound.pause(() => {
+                setIsPlaying(false);
+            });
         } else {
             sound.play(() => {
                 setIsPlaying(false);
                 setCurrentDuration(0); // Reset duration when playback finishes
             });
+            setIsPlaying(true);
         }
-        setIsPlaying(!isPlaying);
     };
 
     const stop = () => {
@@ -164,7 +196,8 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
             prevTrack,
             setTracks: updateTracks,
             setCurrentTrack: updateCurrentTrack,
-            setCurrentDuration: updateCurrentDuration, // Добавлено
+            setCurrentDuration: updateCurrentDuration,
+            isLoading,
         }}>
             {children}
         </PlayerContext.Provider>

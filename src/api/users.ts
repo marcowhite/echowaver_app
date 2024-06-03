@@ -1,6 +1,30 @@
 import { User } from "./schemas";
 import sendRequest from "../utils/request"
 
+// Подписка на пользователя по ID
+export const followUserById = async (id: number): Promise<any> => {
+    return sendRequest(`user/follow/${id}`, 'POST');
+};
+
+// Получение профиля пользователя по ID
+export const getUserProfileById = async (id: number): Promise<any> => {
+    return sendRequest(`user/profile/${id}`, 'GET');
+};
+
+// Получение подписчиков пользователя по ID
+export const getUserFollowersById = async (id: number): Promise<any> => {
+    return sendRequest(`user/followers/${id}`, 'GET');
+};
+
+// Получение подписок пользователя по ID
+export const getUserFollowsById = async (id: number): Promise<any> => {
+    return sendRequest(`user/follows/${id}`, 'GET');
+};
+
+export const unfollowUserById = async (id: number): Promise<any> => {
+    return sendRequest(`user/unfollow/${id}`, 'POST');
+};
+
 export const getUserRoles = async (): Promise<any> => {
     return sendRequest('user/role', 'GET');
 };
@@ -9,11 +33,7 @@ export const getFollowings = async (userId: number): Promise<any> => {
     return sendRequest(`user/follow/${userId}`, 'GET');
 };
 
-export const followUser = async (userId: number, targetUserId: number): Promise<boolean> => {
-    return sendRequest(`user/followers/${targetUserId}`, 'POST', { follower_id: userId });
-};
-
-export const getUsers = async (): Promise<any> => {
+export const getCurrentUser = async (): Promise<any> => {
     return sendRequest('user/auth/me', 'GET');
 };
 
