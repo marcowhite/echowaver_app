@@ -4,8 +4,9 @@ import { Button, Card, Text } from '@rneui/themed';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { getSongs, getAlbums, Song, Album, UserProfile } from '../../../api';
 import SongListItem from '../../../components/SongListItem';
-import AlbumCardItem from '../../../components/AlbumCardItem'; // Import the new component
+import AlbumCardItem from '../../../components/AlbumCardItem';
 import { usePlayer } from '../../../contexts/PlayerContext';
+import { useLike } from '../../../contexts/LikeContext';
 import MiniPlayer from '../../../components/MiniPlayer';
 import SongsCard from '../../../components/SongsCard';
 import AlbumsCard from '../../../components/AlbumsCard';
@@ -25,6 +26,7 @@ function Feed(): React.JSX.Element {
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { tracks, currentTrack, setCurrentTrack, setTracks } = usePlayer();
+  const { likedSongs } = useLike();
 
   const fetchSongs = async () => {
     try {
@@ -64,8 +66,7 @@ function Feed(): React.JSX.Element {
         }
       >
         <SongsCard songs={songs} />
-        {/* <AlbumsCard albums={albums} /> */}
-
+        <AlbumsCard albums={albums} />
       </ScrollView>
       <MiniPlayer />
     </>

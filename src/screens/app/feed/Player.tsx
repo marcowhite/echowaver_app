@@ -3,6 +3,7 @@ import { StyleSheet, View, Image, Text, TouchableOpacity, ActivityIndicator } fr
 import Slider from '@react-native-community/slider';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { usePlayer } from '../../../contexts/PlayerContext';
+import { useLike } from '../../../contexts/LikeContext';
 import { UserProfile, getUserProfile } from '../../../api';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from './Feed';
@@ -20,16 +21,16 @@ const Player: React.FC = () => {
         nextTrack,
         prevTrack,
         setCurrentDuration,
-        isLoading,
-        isLiked,
-        toggleLike,
     } = usePlayer();
+
+    const { isLiked, toggleLike } = useLike();
 
     if (!currentTrack) {
         return <Text>Loading...</Text>;
     }
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -43,6 +44,12 @@ const Player: React.FC = () => {
 
         fetchProfile();
     }, [currentTrack.user_id]);
+
+    const handleToggleLike = async () => {
+        setIsLoading(true);
+        await toggleLike(currentTrack.id);
+        setIsLoading(false);
+    };
 
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     return (
@@ -88,8 +95,8 @@ const Player: React.FC = () => {
                 </TouchableOpacity>
             </View>
             <View style={styles.likeContainer}>
-                <TouchableOpacity onPress={toggleLike} disabled={isLoading}>
-                    <Ionicons name={isLiked ? 'heart' : 'heart-outline'} size={32} color="#ff0000" />
+                <TouchableOpacity onPress={handleToggleLike} disabled={isLoading}>
+                    <Ionicons name={isLiked(currentTrack.id) ? 'heart' : 'heart-outline'} size={32} color="#ff0000" />
                 </TouchableOpacity>
             </View>
             <View style={styles.volumeControl}>

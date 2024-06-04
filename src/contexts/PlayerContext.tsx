@@ -3,6 +3,7 @@ import Sound from 'react-native-sound';
 import RNFS from 'react-native-fs';
 import { Song, User, getUserLikes, likeSong, unlikeSong } from '../api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLike } from './LikeContext';
 
 type PlayerContextType = {
     tracks: Song[];
@@ -21,8 +22,6 @@ type PlayerContextType = {
     setCurrentTrack: (track: Song) => void;
     setCurrentDuration: (value: number) => void;
     isLoading: boolean;
-    isLiked: boolean;
-    toggleLike: () => void;
 };
 
 type PlayerProviderProps = {
@@ -40,9 +39,9 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     const [totalDuration, setTotalDuration] = useState(0);
     const [volume, setVolume] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
-    const [isLiked, setIsLiked] = useState(false);
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const playbackInstanceRef = useRef<Sound | null>(null);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const { likedSongs, toggleLike, isLiked } = useLike();
 
     useEffect(() => {
         const fetchCurrentUser = async () => {
@@ -59,40 +58,6 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
 
         fetchCurrentUser();
     }, []);
-
-    useEffect(() => {
-        const fetchLikes = async () => {
-            if (currentTrack && currentUser) {
-                try {
-                    const userLikes = await getUserLikes(currentUser.id);
-                    const liked = userLikes.song_like.some((like) => like.liked_id === currentTrack.id);
-                    setIsLiked(liked);
-                } catch (error) {
-                    console.error('Failed to fetch user likes', error);
-                }
-            }
-        };
-
-        fetchLikes();
-    }, [currentTrack, currentUser]);
-
-    const toggleLike = async () => {
-        if (!currentTrack || !currentUser) return;
-
-        setIsLoading(true);
-        try {
-            if (isLiked) {
-                await unlikeSong(currentTrack.id);
-            } else {
-                await likeSong(currentTrack.id);
-            }
-            setIsLiked(!isLiked);
-        } catch (error) {
-            console.error('Failed to toggle like', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     const updateTracks = (updatedTracks: Song[]) => {
         setTracks(updatedTracks);
@@ -250,8 +215,6 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
             setCurrentTrack: updateCurrentTrack,
             setCurrentDuration: updateCurrentDuration,
             isLoading,
-            isLiked,
-            toggleLike,
         }}>
             {children}
         </PlayerContext.Provider>

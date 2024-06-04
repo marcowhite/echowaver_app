@@ -12,6 +12,7 @@ import Profile from '../screens/app/feed/Profile';
 import FollowersOrFollowing from '../screens/app/feed/Follow';
 import MiniPlayer from '../components/MiniPlayer';
 import Library from '../screens/app/feed/Library';
+import { LikeProvider } from '../contexts/LikeContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -39,32 +40,34 @@ const FeedNavigator = () => {
 
 export const AppStack = () => {
     return (
-        <PlayerProvider>
-            <Tab.Navigator
-                initialRouteName="Feed"
-                screenOptions={({ route }) => ({
-                    tabBarIcon: ({ color, size }) => {
-                        let iconName: string;
+        <LikeProvider>
+            <PlayerProvider>
+                <Tab.Navigator
+                    initialRouteName="Feed"
+                    screenOptions={({ route }) => ({
+                        tabBarIcon: ({ color, size }) => {
+                            let iconName: string;
 
-                        if (route.name === 'Feed') {
-                            iconName = 'newspaper'; // Ionicons name for feed icon
-                        } else if (route.name === 'SettingsNavigator') {
-                            iconName = 'settings'; // Ionicons name for profile icon
-                        } else if (route.name === 'Library') {
-                            iconName = 'library'; // Ionicons name for profile icon
-                        } else {
-                            iconName = 'help-circle'; // Default icon
-                        }
+                            if (route.name === 'Feed') {
+                                iconName = 'newspaper'; // Ionicons name for feed icon
+                            } else if (route.name === 'SettingsNavigator') {
+                                iconName = 'settings'; // Ionicons name for profile icon
+                            } else if (route.name === 'Library') {
+                                iconName = 'library'; // Ionicons name for profile icon
+                            } else {
+                                iconName = 'help-circle'; // Default icon
+                            }
 
-                        return <Ionicons name={iconName} size={size} color={color} />;
-                    },
-                })}
-            >
-                <Tab.Screen name="Feed" component={FeedNavigator} />
-                <Tab.Screen name="Library" component={Library} />
-                <Tab.Screen name="SettingsNavigator" component={SettingsNavigator} options={{ title: 'Settings' }} />
-            </Tab.Navigator>
-        </PlayerProvider>
+                            return <Ionicons name={iconName} size={size} color={color} />;
+                        },
+                    })}
+                >
+                    <Tab.Screen name="Feed" component={FeedNavigator} />
+                    <Tab.Screen name="Library" component={Library} />
+                    <Tab.Screen name="SettingsNavigator" component={SettingsNavigator} options={{ title: 'Settings' }} />
+                </Tab.Navigator>
+            </PlayerProvider>
+        </LikeProvider>
     );
 };
 
