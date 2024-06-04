@@ -58,9 +58,7 @@ export const deleteUserById = async (userId: number): Promise<any> => {
     return sendRequest(`user/auth/${userId}`, 'DELETE');
 };
 
-export const getUserReposts = async (userId: number): Promise<any> => {
-    return sendRequest(`user/reposts/${userId}`, 'GET');
-};
-export const getUserLikes = async (userId: number): Promise<any> => {
-    return sendRequest(`user/likes/${userId}`, 'GET');
+// Получение лайков пользователя по ID
+export const getUserLikes = async (id: number): Promise<any> => {
+    return sendRequest(`user/likes/${id}`, 'GET');
 };

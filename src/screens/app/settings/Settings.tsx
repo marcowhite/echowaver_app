@@ -20,7 +20,7 @@ import Profile from '../feed/Profile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-type StackParamList = {
+export type StackParamList = {
   Settings: undefined;
   AddSong: undefined;
 };

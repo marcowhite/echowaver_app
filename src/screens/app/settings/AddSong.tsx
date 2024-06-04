@@ -5,12 +5,16 @@ import {
   StyleSheet,
   ActivityIndicator,
   Switch,
+  Alert,
 } from 'react-native';
 import { Input, Button } from '@rneui/themed';
 import { Text, Card } from '@rneui/themed';
 import DocumentPicker, { types } from 'react-native-document-picker';
 import { SongAdd } from '../../../api';
 import { UploadFileItem } from 'react-native-fs';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { StackParamList } from './Settings';
 
 const sendFileToServer = async (file: UploadFileItem, endpoint: string) => {
   try {
@@ -41,6 +45,9 @@ const sendFileToServer = async (file: UploadFileItem, endpoint: string) => {
   }
 };
 
+
+type ProfileScreenNavigationProp = NativeStackNavigationProp<StackParamList, 'AddSong'>;
+
 function AddSong(): React.JSX.Element {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -52,11 +59,40 @@ function AddSong(): React.JSX.Element {
 
   const [loadingAudio, setLoadingAudio] = useState(false);
   const [loadingPicture, setLoadingPicture] = useState(false);
+  const navigation = useNavigation<ProfileScreenNavigationProp>();
 
   const postSong = async (song: SongAdd, audioData: UploadFileItem | null, pictureData: UploadFileItem | null) => {
     try {
       setLoadingAudio(true);
       setLoadingPicture(true);
+
+      // const formData = new FormData();
+      // formData.append('name', song.name);
+      // formData.append('description', song.description);
+      // formData.append('genre', song.genre);
+      // formData.append('is_public', song.is_public.toString());
+      // formData.append('background', song.background);
+
+      // formData.append('audio_file ', {
+      //   uri: audioData?.filepath,
+      //   name: audioData?.filename,
+      //   type: audioData?.filetype,
+      // })
+
+      // formData.append('image_file ', {
+      //   uri: pictureData?.filepath,
+      //   name: pictureData?.filename,
+      //   type: pictureData?.filetype,
+      // })
+
+
+      // const response = await fetch(`http://10.0.2.2:8000/song/form/`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'multipart/form-data',
+      //   },
+      //   body: formData.toString(),
+      // });
 
       const audioPath = audioData ? await sendFileToServer(audioData, 'audio') : null;
       console.log(audioPath);
@@ -76,7 +112,11 @@ function AddSong(): React.JSX.Element {
       if (!response.ok) {
         throw new Error('Failed to post song');
       }
-
+      else {
+        Alert.alert('Success!', 'Your song was successfully uploaded.', [
+          { text: 'OK', onPress: () => navigation.navigate('Settings') },
+        ]);
+      }
       const result = await response.json();
       console.log(result);
     } catch (error) {

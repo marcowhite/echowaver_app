@@ -21,6 +21,8 @@ const Player: React.FC = () => {
         prevTrack,
         setCurrentDuration,
         isLoading,
+        isLiked,
+        toggleLike,
     } = usePlayer();
 
     if (!currentTrack) {
@@ -83,6 +85,11 @@ const Player: React.FC = () => {
                 </TouchableOpacity>
                 <TouchableOpacity onPress={nextTrack} disabled={!currentTrack}>
                     <Ionicons name={'play-forward'} size={32} style={styles.controlButton} />
+                </TouchableOpacity>
+            </View>
+            <View style={styles.likeContainer}>
+                <TouchableOpacity onPress={toggleLike} disabled={isLoading}>
+                    <Ionicons name={isLiked ? 'heart' : 'heart-outline'} size={32} color="#ff0000" />
                 </TouchableOpacity>
             </View>
             <View style={styles.volumeControl}>
@@ -175,6 +182,9 @@ const styles = StyleSheet.create({
     durationText: {
         fontSize: 14,
         color: 'gray',
+    },
+    likeContainer: {
+        marginBottom: 20,
     },
     volumeControl: {
         flexDirection: 'row',

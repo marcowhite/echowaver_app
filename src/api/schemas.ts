@@ -86,3 +86,13 @@ export interface User extends UserCreate {
     background: string;
     spotlight: string;
 }
+
+export interface Like {
+    liker_id: number,
+    liked_id: number,
+}
+
+export interface Likes {
+    album_like: Like[],
+    song_like: Like[],
+}

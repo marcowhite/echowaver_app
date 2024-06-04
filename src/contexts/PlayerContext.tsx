@@ -2,7 +2,8 @@ import React, { createContext, useState, useEffect, useRef, useContext, ReactNod
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import Sound from 'react-native-sound';
 import RNFS from 'react-native-fs';
-import { Song } from '../api';
+import { Song, User, getUserLikes, likeSong, unlikeSong } from '../api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type PlayerContextType = {
     tracks: Song[];
@@ -19,8 +20,10 @@ type PlayerContextType = {
     prevTrack: () => void;
     setTracks: (tracks: Song[]) => void;
     setCurrentTrack: (track: Song) => void;
-    setCurrentDuration: (value: number) => void; // Добавлено
+    setCurrentDuration: (value: number) => void;
     isLoading: boolean;
+    isLiked: boolean;
+    toggleLike: () => void;
 };
 
 type PlayerProviderProps = {
@@ -38,7 +41,59 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     const [totalDuration, setTotalDuration] = useState(0);
     const [volume, setVolume] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLiked, setIsLiked] = useState(false);
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const playbackInstanceRef = useRef<Sound | null>(null);
+
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const userData = await AsyncStorage.getItem('@current_user');
+                if (userData) {
+                    const user: User = JSON.parse(userData);
+                    setCurrentUser(user);
+                }
+            } catch (error) {
+                console.error('Failed to fetch current user', error);
+            }
+        };
+
+        fetchCurrentUser();
+    }, []);
+
+    useEffect(() => {
+        if (currentTrack && currentUser) {
+            const fetchLikes = async () => {
+                try {
+                    const userLikes = await getUserLikes(currentUser.id);
+                    const liked = userLikes.song_like.some((like) => like.liked_id === currentTrack.id);
+                    setIsLiked(liked);
+                } catch (error) {
+                    console.error('Failed to fetch user likes', error);
+                }
+            };
+
+            fetchLikes();
+        }
+    }, [currentTrack, currentUser]);
+
+    const toggleLike = async () => {
+        if (!currentTrack || !currentUser) return;
+
+        setIsLoading(true);
+        try {
+            if (isLiked) {
+                await unlikeSong(currentTrack.id);
+            } else {
+                await likeSong(currentTrack.id);
+            }
+            setIsLiked(!isLiked);
+        } catch (error) {
+            console.error('Failed to toggle like', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const updateTracks = (updatedTracks: Song[]) => {
         setTracks(updatedTracks);
@@ -49,10 +104,8 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     };
 
     const updateCurrentDuration = (value: number) => {
-        //console.log(`Setting current duration to: ${value}`);
         setCurrentDuration(value);
         if (sound) {
-            //console.log(`Setting sound current time to: ${value}`);
             sound.setCurrentTime(value);
         }
     };
@@ -60,7 +113,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     useEffect(() => {
         if (currentTrack) {
             const fetchAudio = async () => {
-                setIsLoading(true); // Устанавливаем состояние загрузки
+                setIsLoading(true);
                 try {
                     const filePath = `${RNFS.DocumentDirectoryPath}/${currentTrack.audio_file}`;
                     const fileExists = await RNFS.exists(filePath);
@@ -83,7 +136,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
                 } catch (error) {
                     console.error('Failed to fetch audio', error);
                 } finally {
-                    setIsLoading(false); // Сбрасываем состояние загрузки
+                    setIsLoading(false);
                 }
             };
 
@@ -117,7 +170,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
         } else {
             sound.play(() => {
                 setIsPlaying(false);
-                setCurrentDuration(0); // Reset duration when playback finishes
+                setCurrentDuration(0);
             });
             setIsPlaying(true);
         }
@@ -198,6 +251,8 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
             setCurrentTrack: updateCurrentTrack,
             setCurrentDuration: updateCurrentDuration,
             isLoading,
+            isLiked,
+            toggleLike,
         }}>
             {children}
         </PlayerContext.Provider>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { usePlayer } from '../contexts/PlayerContext';
 import { Text } from '@rneui/themed';
@@ -12,7 +12,8 @@ const MiniPlayer: React.FC = () => {
         currentTrack,
         isPlaying,
         playPause,
-        isLoading,
+        isLiked,
+        toggleLike,
     } = usePlayer();
 
     const navigation = useNavigation<NavigationProp<any>>();
@@ -33,7 +34,6 @@ const MiniPlayer: React.FC = () => {
         }
     }, [currentTrack]);
 
-    // Если currentTrack отсутствует, не рендерим компонент
     if (!currentTrack) {
         return null;
     }
@@ -45,13 +45,14 @@ const MiniPlayer: React.FC = () => {
                 <Text style={styles.trackTitle}>{currentTrack.name}</Text>
                 <Text style={styles.trackArtist}>{profile?.display_name}</Text>
             </View>
-            <TouchableOpacity activeOpacity={1} onPress={playPause} style={styles.playPauseButton}>
-                {isLoading ? (
-                    <ActivityIndicator size="small" color="#fff" />
-                ) : (
+            <View style={styles.actions}>
+                <TouchableOpacity activeOpacity={1} onPress={toggleLike} style={styles.likeButton}>
+                    <Ionicons name={isLiked ? 'heart' : 'heart-outline'} size={24} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity activeOpacity={1} onPress={playPause} style={styles.playPauseButton}>
                     <Ionicons name={isPlaying ? 'pause' : 'play'} size={24} color="#fff" />
-                )}
-            </TouchableOpacity>
+                </TouchableOpacity>
+            </View>
         </TouchableOpacity>
     );
 };
@@ -85,6 +86,13 @@ const styles = StyleSheet.create({
     trackArtist: {
         color: '#ccc',
         fontSize: 12,
+    },
+    actions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    likeButton: {
+        padding: 10,
     },
     playPauseButton: {
         padding: 10,

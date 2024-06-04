@@ -32,6 +32,10 @@ export const likeSong = async (songId: number): Promise<any> => {
     return sendRequest(`song/like/${songId}`, 'POST');
 };
 
+export const unlikeSong = async (id: number): Promise<any> => {
+    return sendRequest(`song/like/${id}`, 'DELETE');
+};
+
 export const repostSong = async (songId: number): Promise<any> => {
     return sendRequest(`song/repost/${songId}`, 'POST');
 };
