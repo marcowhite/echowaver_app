@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  ActivityIndicator,
-  Switch,
-  Alert,
-} from 'react-native';
-import { Input, Button } from '@rneui/themed';
-import { Text, Card } from '@rneui/themed';
-import DocumentPicker, { types } from 'react-native-document-picker';
-import { SongAdd } from '../../../api';
-import { UploadFileItem } from 'react-native-fs';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Button, Card, Input, Text } from '@rneui/themed';
+import React, { useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  View,
+} from 'react-native';
+import DocumentPicker, { types } from 'react-native-document-picker';
+import { UploadFileItem } from 'react-native-fs';
+import { SongAdd } from '../../../api';
 import { StackParamList } from './Settings';
 
 const sendFileToServer = async (file: UploadFileItem, endpoint: string) => {

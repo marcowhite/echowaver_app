@@ -11,6 +11,7 @@ import { PlayerProvider } from "../contexts/PlayerContext"
 import Profile from '../screens/app/feed/Profile';
 import FollowersOrFollowing from '../screens/app/feed/Follow';
 import MiniPlayer from '../components/MiniPlayer';
+import Library from '../screens/app/feed/Library';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -49,6 +50,8 @@ export const AppStack = () => {
                             iconName = 'newspaper'; // Ionicons name for feed icon
                         } else if (route.name === 'SettingsNavigator') {
                             iconName = 'settings'; // Ionicons name for profile icon
+                        } else if (route.name === 'Library') {
+                            iconName = 'library'; // Ionicons name for profile icon
                         } else {
                             iconName = 'help-circle'; // Default icon
                         }
@@ -58,6 +61,7 @@ export const AppStack = () => {
                 })}
             >
                 <Tab.Screen name="Feed" component={FeedNavigator} />
+                <Tab.Screen name="Library" component={Library} />
                 <Tab.Screen name="SettingsNavigator" component={SettingsNavigator} options={{ title: 'Settings' }} />
             </Tab.Navigator>
         </PlayerProvider>

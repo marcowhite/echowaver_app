@@ -1,23 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
-  Switch,
-  View,
   ScrollView,
-  StyleSheet,
+  StyleSheet
 } from 'react-native';
 
-import { Input, Button, } from '@rneui/themed';
-import { Text } from '@rneui/themed';
-import { Card } from '@rneui/themed';
-import CookieManager, { Cookie } from '@react-native-cookies/cookies';
-import { useNavigation, NavigationProp, useNavigationContainerRef } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Button, Card, } from '@rneui/themed';
 import { useAuth } from '../../../contexts/AuthContext';
-import ProfileHeader from '../../../components/ProfileHeader';
-import { Album, Song, User, getAlbumsByUserId, getCurrentUser, getSongsByUserId } from '../../../api';
-import { Divider } from '@rneui/base';
-import Profile from '../feed/Profile';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export type StackParamList = {

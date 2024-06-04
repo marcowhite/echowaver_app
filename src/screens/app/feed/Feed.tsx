@@ -16,6 +16,7 @@ export type RootStackParamList = {
   AddSong: undefined;
   Profile: { profile: UserProfile | null };
   FollowersOrFollowing: { profile: UserProfile; type: 'followers' | 'following' };
+  Library: undefined;
 };
 
 function Feed(): React.JSX.Element {
@@ -63,7 +64,7 @@ function Feed(): React.JSX.Element {
         }
       >
         <SongsCard songs={songs} />
-        <AlbumsCard albums={albums} />
+        {/* <AlbumsCard albums={albums} /> */}
 
       </ScrollView>
       <MiniPlayer />
