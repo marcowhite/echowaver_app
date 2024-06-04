@@ -7,6 +7,7 @@ import { useLike } from '../../../contexts/LikeContext';
 import { UserProfile, getUserProfile } from '../../../api';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from './Feed';
+import { track } from '@amplitude/analytics-react-native'; // Добавьте импорт
 
 const Player: React.FC = () => {
     const {
@@ -45,10 +46,20 @@ const Player: React.FC = () => {
         fetchProfile();
     }, [currentTrack.user_id]);
 
+    useEffect(() => {
+        track('Track Played', { trackId: currentTrack.id, trackName: currentTrack.name });
+    }, [currentTrack]);
+
     const handleToggleLike = async () => {
         setIsLoading(true);
         await toggleLike(currentTrack.id);
         setIsLoading(false);
+        track(isLiked(currentTrack.id) ? 'Track Unliked' : 'Track Liked', { trackId: currentTrack.id, trackName: currentTrack.name });
+    };
+
+    const handlePlayPause = () => {
+        playPause();
+        track(isPlaying ? 'Track Paused' : 'Track Resumed', { trackId: currentTrack.id, trackName: currentTrack.name });
     };
 
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -84,7 +95,7 @@ const Player: React.FC = () => {
                 <TouchableOpacity onPress={prevTrack} disabled={!currentTrack}>
                     <Ionicons name={'play-back'} size={32} style={styles.controlButton} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={playPause} disabled={!currentTrack}>
+                <TouchableOpacity onPress={handlePlayPause} disabled={!currentTrack}>
                     <Ionicons name={isPlaying ? 'pause' : 'play'} size={32} style={styles.controlButton} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={stop} disabled={!currentTrack}>

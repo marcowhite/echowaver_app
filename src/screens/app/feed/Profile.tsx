@@ -9,6 +9,7 @@ import { usePlayer } from '../../../contexts/PlayerContext';
 import { useUser } from '../../../contexts/UserContext';
 import AlbumsCard from '../../../components/AlbumsCard';
 import SongsCard from '../../../components/SongsCard';
+import { track } from '@amplitude/analytics-react-native';
 
 type ProfileScreenRouteProp = RouteProp<RootStackParamList, 'Profile'>;
 
@@ -40,7 +41,7 @@ function Profile(): React.JSX.Element {
       setAlbums(albums);
       setFollowers(followers);
       setFollows(follows);
-
+      track('Opened Profile', { userId: profile.id });
       if (currentUser) {
         setIsFollowing(followers.some((follower: { id: number; }) => follower.id === currentUser.id));
       }
@@ -61,6 +62,7 @@ function Profile(): React.JSX.Element {
       const updatedFollowers = await getUserFollowersById(profile.id);
       setFollowers(updatedFollowers);
       await refreshCurrentUser();
+      track('Follow User', { userId: profile.id });
     } catch (error) {
       console.error('Failed to follow user', error);
     }
@@ -74,6 +76,7 @@ function Profile(): React.JSX.Element {
       const updatedFollowers = await getUserFollowersById(profile.id);
       setFollowers(updatedFollowers);
       await refreshCurrentUser();
+      track('Unfollow User', { userId: profile.id });
     } catch (error) {
       console.error('Failed to unfollow user', error);
     }

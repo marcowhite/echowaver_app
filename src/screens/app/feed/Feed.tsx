@@ -11,6 +11,7 @@ import AlbumsCard from '../../../components/AlbumsCard';
 import FollowsCard from '../../../components/FollowsCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../../../contexts/UserContext';
+import { track } from '@amplitude/analytics-react-native';
 
 export type RootStackParamList = {
   MainFeed: undefined;
@@ -63,6 +64,7 @@ function Feed(): React.JSX.Element {
   useEffect(() => {
     fetchSongs();
     fetchAlbums();
+    track("Opened Feed")
   }, []);
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import { UserProfile, followUserById, unfollowUserById, getUserFollowersById, ge
 import UserListItem from '../../../components/UserListItem';
 import { RootStackParamList } from './Feed';
 import { useUser } from '../../../contexts/UserContext';
+import { track } from '@amplitude/analytics-react-native';
 
 type FollowersOrFollowingScreenRouteProp = RouteProp<RootStackParamList, 'FollowersOrFollowing'>;
 
@@ -23,8 +24,10 @@ function FollowersOrFollowing(): React.JSX.Element {
       let fetchedUsers: UserProfile[];
       if (type === 'followers') {
         fetchedUsers = await getUserFollowersById(profile.id);
+        track("Opened Followers", { userId: profile.id })
       } else {
         fetchedUsers = await getUserFollowsById(profile.id);
+        track("Opened Follows", { userId: profile.id })
       }
       setUsers(fetchedUsers);
     } catch (error) {
@@ -59,6 +62,7 @@ function FollowersOrFollowing(): React.JSX.Element {
       setFollowing(prev => new Set(prev).add(userId));
       setCurrentUserFollows(prev => new Set(prev).add(userId));
       await refreshCurrentUser();
+      track('Follow User', { userId: userId });
     } catch (error) {
       console.error('Failed to follow user', error);
     }
@@ -78,6 +82,7 @@ function FollowersOrFollowing(): React.JSX.Element {
         return updated;
       });
       await refreshCurrentUser();
+      track('Unfollow User', { userId: userId });
     } catch (error) {
       console.error('Failed to unfollow user', error);
     }

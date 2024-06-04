@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet
@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Button, Card, } from '@rneui/themed';
 import { useAuth } from '../../../contexts/AuthContext';
+import { track } from '@amplitude/analytics-react-native';
 
 
 export type StackParamList = {
@@ -21,6 +22,11 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<StackParamList, 'Se
 function Settings(): React.JSX.Element {
   const { signOut } = useAuth();
   const navigation = useNavigation<ProfileScreenNavigationProp>();
+
+  useEffect(() => {
+    track("Opened Settings");
+  }), [];
+
   return (
     <ScrollView>
       <Card>
@@ -28,7 +34,10 @@ function Settings(): React.JSX.Element {
         <Card.Divider />
         <Button onPress={() => navigation.navigate("AddSong")}>Upload a new song</Button>
         <Card.Divider />
-        <Button onPress={signOut}>Logout</Button>
+        <Button onPress={() => {
+          track("Logged Out")
+          signOut()
+        }}>Logout</Button>
       </Card>
     </ScrollView>
   );

@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { getUserLikes, likeSong, unlikeSong, Song } from '../api';
 import { useUser } from './UserContext';
+import { track } from '@amplitude/analytics-react-native';
 
 type LikeContextType = {
     likedSongs: Set<number>;
@@ -41,9 +42,11 @@ export const LikeProvider: React.FC<LikeProviderProps> = ({ children }) => {
             if (likedSongs.has(songId)) {
                 await unlikeSong(songId);
                 setLikedSongs(prev => new Set([...prev].filter(id => id !== songId)));
+                track('Unlike Song', { songId });
             } else {
                 await likeSong(songId);
                 setLikedSongs(prev => new Set(prev).add(songId));
+                track('Like Song', { songId });
             }
         } catch (error) {
             console.error('Failed to toggle like', error);

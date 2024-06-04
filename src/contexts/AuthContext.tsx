@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthData, authService } from '../services/AuthService';
 import CookieManager from '@react-native-cookies/cookies';
 import { User, getCurrentUser } from '../api';
+import { Identify, identify, setUserId } from '@amplitude/analytics-react-native';
 
 type AuthContextData = {
   authData?: AuthData;
@@ -43,6 +44,21 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
       const userProfile = await getCurrentUser(); // Замените на правильный путь получения профиля
       await saveCurrentUser(userProfile);
+      // Установите данные пользователя в Amplitude
+      setUserId(userProfile.id);
+      const identifyObj = new Identify()
+        .set('email', userProfile.email)
+        .set('display_name', userProfile.display_name)
+        .set('first_name', userProfile.first_name)
+        .set('last_name', userProfile.last_name)
+        .set('city', userProfile.city)
+        .set('bio', userProfile.bio)
+        .set('url', userProfile.url)
+        .set('avatar', userProfile.avatar)
+        .set('background', userProfile.background)
+        .set('spotlight', userProfile.spotlight);
+
+      identify(identifyObj);
 
     } catch (error) {
       console.error('Failed to sign in:', error);
@@ -62,7 +78,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const signOut = async () => {
     setAuthData(undefined);
     await AsyncStorage.removeItem('@AuthData');
-    await AsyncStorage.removeItem('@current_user'); 
+    await AsyncStorage.removeItem('@current_user');
     await CookieManager.clearAll();
   };
 

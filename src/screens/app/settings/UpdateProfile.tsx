@@ -6,6 +6,7 @@ import DocumentPicker, { types } from 'react-native-document-picker';
 import { patchCurrentUser, User, UserUpdate } from '../../../api';
 import { useUser } from '../../../contexts/UserContext';
 import { UploadFileItem } from 'react-native-fs';
+import { track } from '@amplitude/analytics-react-native';
 
 type ProfileScreenNavigationProp = NavigationProp<any, 'Profile'>;
 
@@ -107,6 +108,7 @@ const UpdateProfile: React.FC = () => {
 
             Alert.alert('Success', 'Profile updated successfully', [{ text: 'OK' }]);
             navigation.navigate('Profile', { profile: currentUser });
+            track("Updated Profile")
         } catch (error) {
             console.error('Error updating profile:', error);
             Alert.alert('Error', 'Failed to update profile');

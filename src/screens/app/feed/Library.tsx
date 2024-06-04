@@ -7,6 +7,7 @@ import MiniPlayer from '../../../components/MiniPlayer';
 import SongsCard from '../../../components/SongsCard';
 import { RootStackParamList } from './Feed';
 import { useUser } from '../../../contexts/UserContext';
+import { track } from '@amplitude/analytics-react-native';
 
 function Library(): React.JSX.Element {
     const [likedSongs, setLikedSongs] = useState<Song[]>([]);
@@ -32,6 +33,7 @@ function Library(): React.JSX.Element {
 
     useEffect(() => {
         fetchLikedSongs();
+        track("Opened Library")
     }, [currentUser]);
 
     const onRefresh = async () => {
@@ -46,6 +48,7 @@ function Library(): React.JSX.Element {
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
+                contentContainerStyle={styles.scrollViewContent}
             >
                 <SongsCard songs={likedSongs} />
             </ScrollView>
@@ -59,6 +62,9 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    scrollViewContent: {
+        paddingBottom: 100, // чтобы контент не перекрывался футером
     },
 });
 

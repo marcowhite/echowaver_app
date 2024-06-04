@@ -14,6 +14,7 @@ import DocumentPicker, { types } from 'react-native-document-picker';
 import { UploadFileItem } from 'react-native-fs';
 import { SongAdd } from '../../../api';
 import { StackParamList } from './Settings';
+import { track } from '@amplitude/analytics-react-native';
 
 const sendFileToServer = async (file: UploadFileItem, endpoint: string) => {
   try {
@@ -115,6 +116,7 @@ function AddSong(): React.JSX.Element {
         Alert.alert('Success!', 'Your song was successfully uploaded.', [
           { text: 'OK', onPress: () => navigation.navigate('Settings') },
         ]);
+        track('Song Upload')
       }
       const result = await response.json();
       console.log(result);
