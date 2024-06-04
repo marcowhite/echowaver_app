@@ -5,6 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { UserProfile } from '../api';
 import { RootStackParamList } from '../screens/app/feed/Feed';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+// import DefaultUserImage from '@assets/images/default_user.jpg';
 
 interface ProfileHeaderProps {
   user: UserProfile;
@@ -18,10 +19,10 @@ interface ProfileHeaderProps {
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, followers, follows, isCurrentUser, isFollowing, onFollow, onUnfollow }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-
+  const DefaultUserImage = require("./default_user.jpg")
   return (
     <View style={styles.container}>
-      <Image source={ user.avatar === "null" ?  { uri: `http://10.0.2.2:8000/file/image/${user.avatar}` } : require("../components/default_user.jpg")} style={styles.avatar}/>
+      <Image source={user.avatar === "null" ? { uri: `http://10.0.2.2:8000/file/image/${user.avatar}` } : DefaultUserImage} style={styles.avatar} />
       <View style={styles.infoContainer}>
         <Text style={styles.displayName}>{user.display_name}</Text>
         <Text style={styles.fullName}>

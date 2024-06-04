@@ -4,6 +4,7 @@ import { Button, Input, Text, Card } from '@rneui/themed';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useAuth } from '../../contexts/AuthContext';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+// import EnterImage from '@assets/images/enter.jpeg';
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -16,7 +17,7 @@ function Login(): React.JSX.Element {
   const [secure, setSecure] = useState(false);
   const { signIn } = useAuth();
   const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
-
+  const EnterImage = require('./enter.jpeg')
   const handleLogin = async (username: string, password: string) => {
     try {
       await signIn(username, password);
@@ -32,7 +33,7 @@ function Login(): React.JSX.Element {
   return (
     <ScrollView>
       <Card>
-        <Card.Image style={styles.image} source={require('../auth/enter.jpeg')}></Card.Image>
+        <Card.Image style={styles.image} source={EnterImage}></Card.Image>
       </Card>
       <Card>
         <Card.Title h3={true}>Welcome to Echowaver!</Card.Title>

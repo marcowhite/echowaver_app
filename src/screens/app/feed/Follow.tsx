@@ -5,7 +5,7 @@ import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { UserProfile, followUserById, unfollowUserById, getUserFollowersById, getUserFollowsById } from '../../../api';
 import UserListItem from '../../../components/UserListItem';
 import { RootStackParamList } from './Feed';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '../../../contexts/UserContext';
 
 type FollowersOrFollowingScreenRouteProp = RouteProp<RootStackParamList, 'FollowersOrFollowing'>;
 
@@ -14,6 +14,7 @@ function FollowersOrFollowing(): React.JSX.Element {
   const { profile, type } = route.params;
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [following, setFollowing] = useState<Set<number>>(new Set());
+  const { currentUser, refreshCurrentUser } = useUser();
   const [currentUserFollows, setCurrentUserFollows] = useState<Set<number>>(new Set());
   const [currentUserFollowers, setCurrentUserFollowers] = useState<Set<number>>(new Set());
 
@@ -33,10 +34,7 @@ function FollowersOrFollowing(): React.JSX.Element {
 
   const fetchCurrentUserFollowsAndFollowers = async () => {
     try {
-      const jsonValue = await AsyncStorage.getItem('@current_user');
-      if (jsonValue != null) {
-        const currentUser: UserProfile = JSON.parse(jsonValue);
-
+      if (currentUser) {
         const [follows, followers] = await Promise.all([
           getUserFollowsById(currentUser.id),
           getUserFollowersById(currentUser.id)
@@ -60,6 +58,7 @@ function FollowersOrFollowing(): React.JSX.Element {
       await followUserById(userId);
       setFollowing(prev => new Set(prev).add(userId));
       setCurrentUserFollows(prev => new Set(prev).add(userId));
+      await refreshCurrentUser();
     } catch (error) {
       console.error('Failed to follow user', error);
     }
@@ -78,6 +77,7 @@ function FollowersOrFollowing(): React.JSX.Element {
         updated.delete(userId);
         return updated;
       });
+      await refreshCurrentUser();
     } catch (error) {
       console.error('Failed to unfollow user', error);
     }
@@ -89,6 +89,7 @@ function FollowersOrFollowing(): React.JSX.Element {
         <UserListItem
           key={user.id}
           user={user}
+          isCurrentUser={currentUser?.id === user.id}
           isFollowing={currentUserFollows.has(user.id)}
           onFollow={() => handleFollow(user.id)}
           onUnfollow={() => handleUnfollow(user.id)}

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import ProfileHeader from '../../../components/ProfileHeader';
-import { Album, Song, User, UserProfile, getAlbumsByUserId, getSongsByUserId, getUserFollowersById, getUserFollowsById, followUserById, unfollowUserById } from '../../../api';
+import { Album, Song, UserProfile, getAlbumsByUserId, getSongsByUserId, getUserFollowersById, getUserFollowsById, followUserById, unfollowUserById } from '../../../api';
 import { RootStackParamList } from './Feed';
 import { usePlayer } from '../../../contexts/PlayerContext';
+import { useUser } from '../../../contexts/UserContext';
 import AlbumsCard from '../../../components/AlbumsCard';
 import SongsCard from '../../../components/SongsCard';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type ProfileScreenRouteProp = RouteProp<RootStackParamList, 'Profile'>;
 
@@ -20,7 +20,7 @@ function Profile(): React.JSX.Element {
   const [followers, setFollowers] = useState<UserProfile[]>([]);
   const [follows, setFollows] = useState<UserProfile[]>([]);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const { currentUser, refreshCurrentUser } = useUser();
   const { tracks, currentTrack, setCurrentTrack, setTracks } = usePlayer();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
@@ -29,13 +29,6 @@ function Profile(): React.JSX.Element {
       if (!profile) return;
 
       try {
-        const jsonValue = await AsyncStorage.getItem('@current_user');
-        let currentUser: User | null = null;
-        if (jsonValue != null) {
-          currentUser = JSON.parse(jsonValue);
-          setIsCurrentUser(currentUser?.id === profile.id);
-        }
-
         const [songs, albums, followers, follows] = await Promise.all([
           getSongsByUserId(profile.id),
           getAlbumsByUserId(profile.id),
@@ -66,6 +59,7 @@ function Profile(): React.JSX.Element {
       setIsFollowing(true);
       const updatedFollowers = await getUserFollowersById(profile.id);
       setFollowers(updatedFollowers);
+      await refreshCurrentUser();
     } catch (error) {
       console.error('Failed to follow user', error);
     }
@@ -78,6 +72,7 @@ function Profile(): React.JSX.Element {
       setIsFollowing(false);
       const updatedFollowers = await getUserFollowersById(profile.id);
       setFollowers(updatedFollowers);
+      await refreshCurrentUser();
     } catch (error) {
       console.error('Failed to unfollow user', error);
     }
@@ -94,14 +89,14 @@ function Profile(): React.JSX.Element {
           user={profile}
           followers={followers.length}
           follows={follows.length}
-          isCurrentUser={isCurrentUser}
+          isCurrentUser={currentUser?.id === profile.id}
           isFollowing={isFollowing}
           onFollow={handleFollow}
           onUnfollow={handleUnfollow}
         />
       </Card>
       <SongsCard songs={songs} />
-      <AlbumsCard albums={albums} />
+      {/* <AlbumsCard albums={albums} /> */}
     </ScrollView>
   );
 }

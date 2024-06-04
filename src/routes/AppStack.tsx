@@ -13,6 +13,8 @@ import FollowersOrFollowing from '../screens/app/feed/Follow';
 import MiniPlayer from '../components/MiniPlayer';
 import Library from '../screens/app/feed/Library';
 import { LikeProvider } from '../contexts/LikeContext';
+import UpdateProfile from '../screens/app/settings/UpdateProfile';
+import { UserProvider } from '../contexts/UserContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -22,7 +24,7 @@ const SettingsNavigator = () => {
         <Stack.Navigator>
             <Stack.Screen name='Settings' component={Settings} options={{ headerShown: false }} />
             <Stack.Screen name='AddSong' component={AddSong} options={{ title: 'Upload a song' }} />
-
+            <Stack.Screen name='UpdateProfile' component={UpdateProfile} options={{ title: 'Update profile' }} />
         </Stack.Navigator>
     );
 }
@@ -40,34 +42,36 @@ const FeedNavigator = () => {
 
 export const AppStack = () => {
     return (
-        <LikeProvider>
-            <PlayerProvider>
-                <Tab.Navigator
-                    initialRouteName="Feed"
-                    screenOptions={({ route }) => ({
-                        tabBarIcon: ({ color, size }) => {
-                            let iconName: string;
+        <UserProvider>
+            <LikeProvider>
+                <PlayerProvider>
+                    <Tab.Navigator
+                        initialRouteName="Feed"
+                        screenOptions={({ route }) => ({
+                            tabBarIcon: ({ color, size }) => {
+                                let iconName: string;
 
-                            if (route.name === 'Feed') {
-                                iconName = 'newspaper'; // Ionicons name for feed icon
-                            } else if (route.name === 'SettingsNavigator') {
-                                iconName = 'settings'; // Ionicons name for profile icon
-                            } else if (route.name === 'Library') {
-                                iconName = 'library'; // Ionicons name for profile icon
-                            } else {
-                                iconName = 'help-circle'; // Default icon
-                            }
+                                if (route.name === 'Feed') {
+                                    iconName = 'newspaper'; // Ionicons name for feed icon
+                                } else if (route.name === 'SettingsNavigator') {
+                                    iconName = 'settings'; // Ionicons name for profile icon
+                                } else if (route.name === 'Library') {
+                                    iconName = 'library'; // Ionicons name for profile icon
+                                } else {
+                                    iconName = 'help-circle'; // Default icon
+                                }
 
-                            return <Ionicons name={iconName} size={size} color={color} />;
-                        },
-                    })}
-                >
-                    <Tab.Screen name="Feed" component={FeedNavigator} />
-                    <Tab.Screen name="Library" component={Library} />
-                    <Tab.Screen name="SettingsNavigator" component={SettingsNavigator} options={{ title: 'Settings' }} />
-                </Tab.Navigator>
-            </PlayerProvider>
-        </LikeProvider>
+                                return <Ionicons name={iconName} size={size} color={color} />;
+                            },
+                        })}
+                    >
+                        <Tab.Screen name="Feed" component={FeedNavigator} />
+                        <Tab.Screen name="Library" component={Library} />
+                        <Tab.Screen name="SettingsNavigator" component={SettingsNavigator} options={{ title: 'Settings' }} />
+                    </Tab.Navigator>
+                </PlayerProvider>
+            </LikeProvider>
+        </UserProvider>
     );
 };
 

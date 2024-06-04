@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Input, Button, Text, Card } from '@rneui/themed';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+//import SignUpImage from '@assets/images/signup.jpeg';
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -15,6 +16,7 @@ function Register(): React.JSX.Element {
   const [name, setName] = useState("");
   const [secure, setSecure] = useState(false);
   const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
+  const SignUpImage = require('./signup.jpeg')
 
   interface UserRegister {
     name: string;
@@ -68,7 +70,7 @@ function Register(): React.JSX.Element {
   return (
     <ScrollView>
       <Card>
-        <Card.Image style={styles.image} source={require('../auth/signup.jpeg')}></Card.Image>
+        <Card.Image style={styles.image} source={SignUpImage}></Card.Image>
       </Card>
       <Card>
         <Card.Title h3={true}>Sign Up!</Card.Title>

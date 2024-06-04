@@ -13,6 +13,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 export type StackParamList = {
   Settings: undefined;
   AddSong: undefined;
+  UpdateProfile: undefined;
 };
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<StackParamList, 'Settings'>;
@@ -23,6 +24,8 @@ function Settings(): React.JSX.Element {
   return (
     <ScrollView>
       <Card>
+        <Button onPress={() => navigation.navigate("UpdateProfile")}>Edit profile</Button>
+        <Card.Divider />
         <Button onPress={() => navigation.navigate("AddSong")}>Upload a new song</Button>
         <Card.Divider />
         <Button onPress={signOut}>Logout</Button>

@@ -1,31 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View, RefreshControl } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { UserProfile, getUserLikes, Song, User, getSongById } from '../../../api';
+import { UserProfile, getUserLikes, Song, getSongById } from '../../../api';
 import { usePlayer } from '../../../contexts/PlayerContext';
 import MiniPlayer from '../../../components/MiniPlayer';
 import SongsCard from '../../../components/SongsCard';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackParamList } from './Feed';
+import { useUser } from '../../../contexts/UserContext';
 
 function Library(): React.JSX.Element {
     const [likedSongs, setLikedSongs] = useState<Song[]>([]);
     const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const { setCurrentTrack, setTracks } = usePlayer();
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-    const fetchCurrentUser = async () => {
-        try {
-            const userData = await AsyncStorage.getItem('@current_user');
-            if (userData) {
-                const user: User = JSON.parse(userData);
-                setCurrentUser(user);
-            }
-        } catch (error) {
-            console.error('Failed to fetch current user', error);
-        }
-    };
+    const { currentUser } = useUser();
 
     const fetchLikedSongs = async () => {
         if (!currentUser) return;
@@ -43,13 +31,7 @@ function Library(): React.JSX.Element {
     };
 
     useEffect(() => {
-        fetchCurrentUser();
-    }, []);
-
-    useEffect(() => {
-        if (currentUser) {
-            fetchLikedSongs();
-        }
+        fetchLikedSongs();
     }, [currentUser]);
 
     const onRefresh = async () => {

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import { getUserLikes, likeSong, unlikeSong, User, Song } from '../api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserLikes, likeSong, unlikeSong, Song } from '../api';
+import { useUser } from './UserContext';
 
 type LikeContextType = {
     likedSongs: Set<number>;
@@ -16,30 +16,14 @@ const LikeContext = createContext<LikeContextType | undefined>(undefined);
 
 export const LikeProvider: React.FC<LikeProviderProps> = ({ children }) => {
     const [likedSongs, setLikedSongs] = useState<Set<number>>(new Set());
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-    useEffect(() => {
-        const fetchCurrentUser = async () => {
-            try {
-                const userData = await AsyncStorage.getItem('@current_user');
-                if (userData) {
-                    const user: User = JSON.parse(userData);
-                    setCurrentUser(user);
-                }
-            } catch (error) {
-                console.error('Failed to fetch current user', error);
-            }
-        };
-
-        fetchCurrentUser();
-    }, []);
+    const { currentUser } = useUser();
 
     useEffect(() => {
         const fetchLikes = async () => {
             if (currentUser) {
                 try {
                     const userLikes = await getUserLikes(currentUser.id);
-                    const likedIds = userLikes.song_like.map(like => like.liked_id);
+                    const likedIds = userLikes.song_like.map((like: { liked_id: any; }) => like.liked_id);
                     setLikedSongs(new Set(likedIds));
                 } catch (error) {
                     console.error('Failed to fetch user likes', error);

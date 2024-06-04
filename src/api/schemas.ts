@@ -96,3 +96,21 @@ export interface Likes {
     album_like: Like[],
     song_like: Like[],
 }
+
+export interface UserUpdate {
+    email?: string;
+    password?: string;
+
+    display_name?: string;
+    first_name?: string;
+    last_name?: string;
+
+    is_public?: boolean;
+    city?: string;
+    bio?: string;
+    url?: string;
+    avatar?: string;
+
+    background?: string;
+    spotlight?: string;
+}
