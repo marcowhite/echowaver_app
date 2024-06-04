@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect, useRef, useContext, ReactNode } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import Sound from 'react-native-sound';
 import RNFS from 'react-native-fs';
 import { Song, User, getUserLikes, likeSong, unlikeSong } from '../api';
@@ -62,8 +61,8 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        if (currentTrack && currentUser) {
-            const fetchLikes = async () => {
+        const fetchLikes = async () => {
+            if (currentTrack && currentUser) {
                 try {
                     const userLikes = await getUserLikes(currentUser.id);
                     const liked = userLikes.song_like.some((like) => like.liked_id === currentTrack.id);
@@ -71,10 +70,10 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
                 } catch (error) {
                     console.error('Failed to fetch user likes', error);
                 }
-            };
+            }
+        };
 
-            fetchLikes();
-        }
+        fetchLikes();
     }, [currentTrack, currentUser]);
 
     const toggleLike = async () => {
@@ -111,8 +110,8 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     };
 
     useEffect(() => {
-        if (currentTrack) {
-            const fetchAudio = async () => {
+        const fetchAudio = async () => {
+            if (currentTrack) {
                 setIsLoading(true);
                 try {
                     const filePath = `${RNFS.DocumentDirectoryPath}/${currentTrack.audio_file}`;
@@ -138,26 +137,26 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
                 } finally {
                     setIsLoading(false);
                 }
-            };
+            }
+        };
 
-            const loadSound = (path: string) => {
-                const newSound = new Sound(path, '', (error) => {
-                    if (error) {
-                        console.log('Failed to load the sound', error);
-                        return;
-                    }
-                    setTotalDuration(newSound.getDuration());
-                    setSound(newSound);
-                    playbackInstanceRef.current = newSound;
-                });
-            };
+        const loadSound = (path: string) => {
+            const newSound = new Sound(path, '', (error) => {
+                if (error) {
+                    console.log('Failed to load the sound', error);
+                    return;
+                }
+                setTotalDuration(newSound.getDuration());
+                setSound(newSound);
+                playbackInstanceRef.current = newSound;
+            });
+        };
 
-            fetchAudio();
+        fetchAudio();
 
-            return () => {
-                sound?.release();
-            };
-        }
+        return () => {
+            sound?.release();
+        };
     }, [currentTrack]);
 
     const playPause = () => {

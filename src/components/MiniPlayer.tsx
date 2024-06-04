@@ -4,34 +4,26 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { usePlayer } from '../contexts/PlayerContext';
 import { Text } from '@rneui/themed';
 import { UserProfile, getUserProfile } from '../api';
-import { useNavigation } from '@react-navigation/native';
-import { NavigationProp } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 
 const MiniPlayer: React.FC = () => {
-    const {
-        currentTrack,
-        isPlaying,
-        playPause,
-        isLiked,
-        toggleLike,
-    } = usePlayer();
-
+    const { currentTrack, isPlaying, playPause, isLiked, toggleLike } = usePlayer();
     const navigation = useNavigation<NavigationProp<any>>();
     const [profile, setProfile] = useState<UserProfile | null>(null);
 
     useEffect(() => {
-        if (currentTrack) {
-            const fetchProfile = async () => {
+        const fetchProfile = async () => {
+            if (currentTrack) {
                 try {
                     const userProfile = await getUserProfile(currentTrack.user_id);
                     setProfile(userProfile);
                 } catch (error) {
                     console.error('Failed to fetch profile', error);
                 }
-            };
+            }
+        };
 
-            fetchProfile();
-        }
+        fetchProfile();
     }, [currentTrack]);
 
     if (!currentTrack) {
@@ -39,8 +31,15 @@ const MiniPlayer: React.FC = () => {
     }
 
     return (
-        <TouchableOpacity activeOpacity={1} style={styles.container} onPress={() => navigation.navigate('Player')}>
-            <Image source={{ uri: `http://10.0.2.2:8000/file/image/${currentTrack.cover_file}` }} style={styles.coverImage} />
+        <TouchableOpacity
+            activeOpacity={1}
+            style={styles.container}
+            onPress={() => navigation.navigate('Player')}
+        >
+            <Image
+                source={{ uri: `http://10.0.2.2:8000/file/image/${currentTrack.cover_file}` }}
+                style={styles.coverImage}
+            />
             <View style={styles.trackInfo}>
                 <Text style={styles.trackTitle}>{currentTrack.name}</Text>
                 <Text style={styles.trackArtist}>{profile?.display_name}</Text>
@@ -67,7 +66,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         width: '100%',
-        height: 70, // Фиксированная высота
+        height: 70,
         zIndex: 1000,
     },
     coverImage: {

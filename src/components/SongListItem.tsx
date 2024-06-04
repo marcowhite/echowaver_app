@@ -14,17 +14,17 @@ const SongListItem: React.FC<SongListItemProps> = ({ song, onPress }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-      const fetchProfile = async () => {
-        try {
-          const userProfile = await getUserProfile(song.user_id);
-          setProfile(userProfile);
-        } catch (error) {
-          console.error('Failed to fetch profile', error);
-        }
-      };
-  
-      fetchProfile();
-    }, [song.user_id]); 
+    const fetchProfile = async () => {
+      try {
+        const userProfile = await getUserProfile(song.user_id);
+        setProfile(userProfile);
+      } catch (error) {
+        console.error('Failed to fetch profile', error);
+      }
+    };
+
+    fetchProfile();
+  }, [song.user_id]);
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image source={{ uri: `http://10.0.2.2:8000/file/image/${song.cover_file}` }} style={styles.coverImage} />
