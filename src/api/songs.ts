@@ -4,6 +4,11 @@ import { SongAdd } from "./schemas";
 export const postSong = async (albumData: SongAdd, audio_file: any, image_file: any): Promise<any> => {
     return sendRequest(`song/`, 'POST', albumData);
 };
+
+export const postSongWithPreupload = async (songData: any): Promise<any> => {
+    return sendRequest(`song/with_preupload/`, 'POST', songData);
+};
+
 export const getSongs = async (): Promise<any> => {
     return sendRequest('song', 'GET');
 };

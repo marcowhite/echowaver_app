@@ -16,34 +16,36 @@ const MiniPlayer: React.FC = () => {
     } = usePlayer();
 
     const navigation = useNavigation<NavigationProp<any>>();
+    const [profile, setProfile] = useState<UserProfile | null>(null);
 
+    useEffect(() => {
+        if (currentTrack) {
+            const fetchProfile = async () => {
+                try {
+                    const userProfile = await getUserProfile(currentTrack.user_id);
+                    setProfile(userProfile);
+                } catch (error) {
+                    console.error('Failed to fetch profile', error);
+                }
+            };
+
+            fetchProfile();
+        }
+    }, [currentTrack]);
+
+    // Если currentTrack отсутствует, не рендерим компонент
     if (!currentTrack) {
         return null;
     }
 
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const userProfile = await getUserProfile(currentTrack.user_id);
-                setProfile(userProfile);
-            } catch (error) {
-                console.error('Failed to fetch profile', error);
-            }
-        };
-
-        fetchProfile();
-    }, [currentTrack.user_id]);
-
     return (
-        <TouchableOpacity style={styles.container} onPress={() => navigation.navigate('Player')}>
+        <TouchableOpacity activeOpacity={1} style={styles.container} onPress={() => navigation.navigate('Player')}>
             <Image source={{ uri: `http://10.0.2.2:8000/file/image/${currentTrack.cover_file}` }} style={styles.coverImage} />
             <View style={styles.trackInfo}>
                 <Text style={styles.trackTitle}>{currentTrack.name}</Text>
                 <Text style={styles.trackArtist}>{profile?.display_name}</Text>
             </View>
-            <TouchableOpacity onPress={playPause} style={styles.playPauseButton}>
+            <TouchableOpacity activeOpacity={1} onPress={playPause} style={styles.playPauseButton}>
                 {isLoading ? (
                     <ActivityIndicator size="small" color="#fff" />
                 ) : (
@@ -64,6 +66,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         width: '100%',
+        height: 70, // Фиксированная высота
         zIndex: 1000,
     },
     coverImage: {

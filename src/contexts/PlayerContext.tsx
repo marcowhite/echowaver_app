@@ -49,10 +49,10 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     };
 
     const updateCurrentDuration = (value: number) => {
-        console.log(`Setting current duration to: ${value}`);
+        //console.log(`Setting current duration to: ${value}`);
         setCurrentDuration(value);
         if (sound) {
-            console.log(`Setting sound current time to: ${value}`);
+            //console.log(`Setting sound current time to: ${value}`);
             sound.setCurrentTime(value);
         }
     };

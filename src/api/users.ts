@@ -1,10 +1,7 @@
 import { User } from "./schemas";
 import sendRequest from "../utils/request"
 
-// Подписка на пользователя по ID
-export const followUserById = async (id: number): Promise<any> => {
-    return sendRequest(`user/follow/${id}`, 'POST');
-};
+
 
 // Получение профиля пользователя по ID
 export const getUserProfileById = async (id: number): Promise<any> => {
@@ -21,8 +18,13 @@ export const getUserFollowsById = async (id: number): Promise<any> => {
     return sendRequest(`user/follows/${id}`, 'GET');
 };
 
+// Подписка на пользователя по ID
+export const followUserById = async (id: number): Promise<any> => {
+    return sendRequest(`user/follow/${id}`, 'POST');
+};
+
 export const unfollowUserById = async (id: number): Promise<any> => {
-    return sendRequest(`user/unfollow/${id}`, 'POST');
+    return sendRequest(`user/unfollow/${id}`, 'DELETE');
 };
 
 export const getUserRoles = async (): Promise<any> => {

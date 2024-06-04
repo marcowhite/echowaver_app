@@ -2,6 +2,8 @@ import React from 'react';
 import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Text, Button } from '@rneui/themed';
 import { UserProfile } from '../api';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../screens/app/feed/Feed';
 
 interface UserListItemProps {
   user: UserProfile;
@@ -11,9 +13,11 @@ interface UserListItemProps {
 }
 
 const UserListItem: React.FC<UserListItemProps> = ({ user, isFollowing, onFollow, onUnfollow }) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
   return (
-    <View style={styles.container}>
-      <Image source={ user.avatar === "null" ? { uri: `http://10.0.2.2:8000/file/image/${user.avatar}` } : require("./default_user.jpg")} style={styles.avatar} />
+    <TouchableOpacity style={styles.container} onPress={() => navigation.navigate('Profile', { profile: user })}>
+      <Image source={user.avatar === "null" ? { uri: `http://10.0.2.2:8000/file/image/${user.avatar}` } : require("./default_user.jpg")} style={styles.avatar} />
       <View style={styles.infoContainer}>
         <Text style={styles.displayName}>{user.display_name}</Text>
         <Text style={styles.fullName}>{user.first_name} {user.last_name}</Text>
@@ -25,7 +29,7 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, isFollowing, onFollow
           <Button onPress={onFollow} title="Follow" buttonStyle={styles.followButton} />
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -36,6 +40,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderColor: '#ccc',
+    backgroundColor: '#fff',
   },
   avatar: {
     width: 50,
@@ -49,10 +54,11 @@ const styles = StyleSheet.create({
   displayName: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#333',
   },
   fullName: {
     fontSize: 14,
-    color: '#555',
+    color: '#777',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -60,12 +66,14 @@ const styles = StyleSheet.create({
   followButton: {
     backgroundColor: '#4CAF50',
     borderRadius: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
   },
   unfollowButton: {
     backgroundColor: '#F44336',
     borderRadius: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
   },
 });
 

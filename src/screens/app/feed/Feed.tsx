@@ -6,6 +6,9 @@ import { getSongs, getAlbums, Song, Album, UserProfile } from '../../../api';
 import SongListItem from '../../../components/SongListItem';
 import AlbumCardItem from '../../../components/AlbumCardItem'; // Import the new component
 import { usePlayer } from '../../../contexts/PlayerContext';
+import MiniPlayer from '../../../components/MiniPlayer';
+import SongsCard from '../../../components/SongsCard';
+import AlbumsCard from '../../../components/AlbumsCard';
 
 export type RootStackParamList = {
   MainFeed: undefined;
@@ -53,42 +56,18 @@ function Feed(): React.JSX.Element {
   };
 
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <Card>
-        <Card.Title h3={true}>Songs</Card.Title>
-        <Card.Divider />
-        {songs.map(song => (
-          <SongListItem
-            key={String(song.id)}
-            song={song}
-            onPress={() => {
-              setTracks(songs);
-              setCurrentTrack(song);
-              navigation.navigate('Player');
-            }}
-          />
-        ))}
-      </Card>
-      <Card>
-        <Card.Title h3={true}>Albums</Card.Title>
-        <Card.Divider />
-        <View style={styles.albumContainer}>
-          {albums.map(album => (
-            <AlbumCardItem
-              key={String(album.id)}
-              album={album}
-              onPress={() => {
-                // Handle album click if needed
-              }}
-            />
-          ))}
-        </View>
-      </Card>
-    </ScrollView>
+    <>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <SongsCard songs={songs} />
+        <AlbumsCard albums={albums} />
+
+      </ScrollView>
+      <MiniPlayer />
+    </>
   );
 }
 

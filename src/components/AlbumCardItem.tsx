@@ -8,20 +8,20 @@ interface AlbumCardItemProps {
 }
 
 const AlbumCardItem: React.FC<AlbumCardItemProps> = ({ album, onPress }) => {
-    const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-          try {
-            const userProfile = await getUserProfile(album.user_id);
-            setProfile(userProfile);
-          } catch (error) {
-            console.error('Failed to fetch profile', error);
-          }
-        };
-    
-        fetchProfile();
-      }, [album.user_id]); 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const userProfile = await getUserProfile(album.user_id);
+        setProfile(userProfile);
+      } catch (error) {
+        console.error('Failed to fetch profile', error);
+      }
+    };
+
+    fetchProfile();
+  }, [album.user_id]);
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image source={{ uri: `http://10.0.2.2:8000/file/image/${album.cover_file}` }} style={styles.coverImage} />

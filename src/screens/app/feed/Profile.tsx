@@ -1,21 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
-
-import { Text } from '@rneui/themed';
-import { Card } from '@rneui/themed';
-
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Text, Card } from '@rneui/themed';
 import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-
 import ProfileHeader from '../../../components/ProfileHeader';
-import { Album, Song, User, getAlbumsByUserId, getSongsByUserId, getUserFollowersById, getUserFollowsById, followUserById, unfollowUserById } from '../../../api';
+import { Album, Song, User, UserProfile, getAlbumsByUserId, getSongsByUserId, getUserFollowersById, getUserFollowsById, followUserById, unfollowUserById } from '../../../api';
 import { RootStackParamList } from './Feed';
-import SongListItem from '../../../components/SongListItem';
 import { usePlayer } from '../../../contexts/PlayerContext';
-import AlbumCardItem from '../../../components/AlbumCardItem';
+import AlbumsCard from '../../../components/AlbumsCard';
+import SongsCard from '../../../components/SongsCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type ProfileScreenRouteProp = RouteProp<RootStackParamList, 'Profile'>;
@@ -25,86 +17,75 @@ function Profile(): React.JSX.Element {
   const { profile } = route.params;
   const [songs, setSongs] = useState<Song[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
-  const [followers, setFollowers] = useState<User[]>([]);
-  const [follows, setFollows] = useState<User[]>([]);
+  const [followers, setFollowers] = useState<UserProfile[]>([]);
+  const [follows, setFollows] = useState<UserProfile[]>([]);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
   const { tracks, currentTrack, setCurrentTrack, setTracks } = usePlayer();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
-    if (!profile) {
-      return;
-    }
+    const fetchProfileData = async () => {
+      if (!profile) return;
 
-    const fetchSongs = async () => {
       try {
-        const songs = await getSongsByUserId(profile.id);
+        const jsonValue = await AsyncStorage.getItem('@current_user');
+        let currentUser: User | null = null;
+        if (jsonValue != null) {
+          currentUser = JSON.parse(jsonValue);
+          setIsCurrentUser(currentUser?.id === profile.id);
+        }
+
+        const [songs, albums, followers, follows] = await Promise.all([
+          getSongsByUserId(profile.id),
+          getAlbumsByUserId(profile.id),
+          getUserFollowersById(profile.id),
+          getUserFollowsById(profile.id),
+        ]);
+
         setSongs(songs);
-      } catch (error) {
-        console.error('Failed to fetch songs', error);
-      }
-    };
-
-    const fetchAlbums = async () => {
-      try {
-        const albums = await getAlbumsByUserId(profile.id);
         setAlbums(albums);
-      } catch (error) {
-        console.error('Failed to fetch albums', error);
-      }
-    };
-
-    const fetchFollowers = async () => {
-      try {
-        const followers = await getUserFollowersById(profile.id);
         setFollowers(followers);
-      } catch (error) {
-        console.error('Failed to fetch followers', error);
-      }
-    };
-
-    const fetchFollows = async () => {
-      try {
-        const follows = await getUserFollowsById(profile.id);
         setFollows(follows);
+
+        if (currentUser) {
+          setIsFollowing(followers.some((follower: { id: number; }) => follower.id === currentUser.id));
+        }
       } catch (error) {
-        console.error('Failed to fetch follows', error);
+        console.error('Failed to load profile data', error);
       }
     };
 
-    fetchSongs();
-    fetchAlbums();
-    fetchFollowers();
-    fetchFollows();
+    fetchProfileData();
   }, [profile]);
 
-  if (!profile) {
-    return <Text>Loading...</Text>;
-  }
-
   const handleFollow = async () => {
+    if (!profile) return;
     try {
       await followUserById(profile.id);
       setIsFollowing(true);
-      // Optionally, refresh followers
-      const followers = await getUserFollowersById(profile.id);
-      setFollowers(followers);
+      const updatedFollowers = await getUserFollowersById(profile.id);
+      setFollowers(updatedFollowers);
     } catch (error) {
       console.error('Failed to follow user', error);
     }
   };
 
   const handleUnfollow = async () => {
+    if (!profile) return;
     try {
       await unfollowUserById(profile.id);
       setIsFollowing(false);
-      // Optionally, refresh followers
-      const followers = await getUserFollowersById(profile.id);
-      setFollowers(followers);
+      const updatedFollowers = await getUserFollowersById(profile.id);
+      setFollowers(updatedFollowers);
     } catch (error) {
       console.error('Failed to unfollow user', error);
     }
   };
+
+  if (!profile) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <ScrollView>
@@ -113,42 +94,14 @@ function Profile(): React.JSX.Element {
           user={profile}
           followers={followers.length}
           follows={follows.length}
-          isCurrentUser={false}
+          isCurrentUser={isCurrentUser}
           isFollowing={isFollowing}
           onFollow={handleFollow}
           onUnfollow={handleUnfollow}
         />
       </Card>
-      <Card>
-        <Card.Title h3={true}>Songs</Card.Title>
-        <Card.Divider />
-        {songs.map(song => (
-          <SongListItem
-            key={String(song.id)}
-            song={song}
-            onPress={() => {
-              setTracks(songs);
-              setCurrentTrack(song);
-              navigation.navigate('Player');
-            }}
-          />
-        ))}
-      </Card>
-      <Card>
-        <Card.Title h3={true}>Albums</Card.Title>
-        <Card.Divider />
-        <View style={styles.albumContainer}>
-          {albums.map(album => (
-            <AlbumCardItem
-              key={String(album.id)}
-              album={album}
-              onPress={() => {
-                // Handle album click if needed
-              }}
-            />
-          ))}
-        </View>
-      </Card>
+      <SongsCard songs={songs} />
+      <AlbumsCard albums={albums} />
     </ScrollView>
   );
 }

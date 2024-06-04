@@ -31,7 +31,7 @@ const FeedNavigator = () => {
             <Stack.Screen name='MainFeed' component={Feed} options={{ headerShown: false }} />
             <Stack.Screen name='Player' component={Player} options={{ title: 'Player' }} />
             <Stack.Screen name='Profile' component={Profile} />
-            <Stack.Screen name='FollowersOrFollowing' component={FollowersOrFollowing} />
+            <Stack.Screen name='FollowersOrFollowing' component={FollowersOrFollowing} options={{ title: 'Users' }} />
         </Stack.Navigator>
     );
 }
@@ -60,9 +60,7 @@ export const AppStack = () => {
                 <Tab.Screen name="Feed" component={FeedNavigator} />
                 <Tab.Screen name="SettingsNavigator" component={SettingsNavigator} options={{ title: 'Settings' }} />
             </Tab.Navigator>
-            <MiniPlayer />
         </PlayerProvider>
-
     );
 };
 
