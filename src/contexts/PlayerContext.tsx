@@ -4,6 +4,7 @@ import RNFS from 'react-native-fs';
 import { Song, User, getUserLikes, likeSong, unlikeSong } from '../api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLike } from './LikeContext';
+import { useUser } from './UserContext';
 
 type PlayerContextType = {
     tracks: Song[];
@@ -40,24 +41,8 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     const [volume, setVolume] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const playbackInstanceRef = useRef<Sound | null>(null);
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const { currentUser } = useUser();
     const { likedSongs, toggleLike, isLiked } = useLike();
-
-    useEffect(() => {
-        const fetchCurrentUser = async () => {
-            try {
-                const userData = await AsyncStorage.getItem('@current_user');
-                if (userData) {
-                    const user: User = JSON.parse(userData);
-                    setCurrentUser(user);
-                }
-            } catch (error) {
-                console.error('Failed to fetch current user', error);
-            }
-        };
-
-        fetchCurrentUser();
-    }, []);
 
     const updateTracks = (updatedTracks: Song[]) => {
         setTracks(updatedTracks);

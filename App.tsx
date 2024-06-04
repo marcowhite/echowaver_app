@@ -1,10 +1,17 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Router } from './src/routes/Router';
 import { AuthProvider } from './src/contexts/AuthContext';
+import { init } from '@amplitude/analytics-react-native';
+import { initializeAmplitude } from './src/utils/amplitude';
 
 function App(): React.JSX.Element {
-  // let cookies = CookieManager.get('http://10.0.2.2:8000/');
+
+
+  useEffect(() => {
+    initializeAmplitude();
+  }, []);
+
   return (
     <AuthProvider>
       <Router />

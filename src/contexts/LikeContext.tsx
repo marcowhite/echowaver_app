@@ -23,7 +23,7 @@ export const LikeProvider: React.FC<LikeProviderProps> = ({ children }) => {
             if (currentUser) {
                 try {
                     const userLikes = await getUserLikes(currentUser.id);
-                    const likedIds = userLikes.song_like.map((like: { liked_id: any; }) => like.liked_id);
+                    const likedIds = userLikes.song_like.map(like => like.liked_id);
                     setLikedSongs(new Set(likedIds));
                 } catch (error) {
                     console.error('Failed to fetch user likes', error);

@@ -10,6 +10,7 @@ import SongsCard from '../../../components/SongsCard';
 import AlbumsCard from '../../../components/AlbumsCard';
 import FollowsCard from '../../../components/FollowsCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '../../../contexts/UserContext';
 
 export type RootStackParamList = {
   MainFeed: undefined;
@@ -19,6 +20,8 @@ export type RootStackParamList = {
   Library: undefined;
 };
 
+
+
 function Feed(): React.JSX.Element {
   const [songs, setSongs] = useState<Song[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -27,19 +30,7 @@ function Feed(): React.JSX.Element {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { tracks, currentTrack, setCurrentTrack, setTracks } = usePlayer();
   const { likedSongs } = useLike();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-  const fetchCurrentUser = async () => {
-    try {
-      const userData = await AsyncStorage.getItem('@current_user');
-      if (userData) {
-        const user: User = JSON.parse(userData);
-        setCurrentUser(user);
-      }
-    } catch (error) {
-      console.error('Failed to fetch current user', error);
-    }
-  };
+  const { currentUser } = useUser();
 
   const fetchSongs = async () => {
     try {
@@ -68,10 +59,6 @@ function Feed(): React.JSX.Element {
       console.error('Failed to fetch follows', error);
     }
   };
-
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
 
   useEffect(() => {
     fetchSongs();
@@ -134,12 +121,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-
   },
   profileButton: {
     flexDirection: 'row',
     alignItems: 'center',
-
   },
   avatar: {
     width: 50,

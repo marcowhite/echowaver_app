@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, View, TouchableOpacity, Image, ActivityIndicato
 import { Button, Card, Input, Text } from '@rneui/themed';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import DocumentPicker, { types } from 'react-native-document-picker';
-import { updateUser, User, UserUpdate } from '../../../api';
+import { patchCurrentUser, User, UserUpdate } from '../../../api';
 import { useUser } from '../../../contexts/UserContext';
 import { UploadFileItem } from 'react-native-fs';
 
@@ -102,7 +102,7 @@ const UpdateProfile: React.FC = () => {
                 spotlight: currentUser.spotlight,
             };
 
-            await updateUser(updatedUser);
+            await patchCurrentUser(updatedUser);
             await refreshCurrentUser();
 
             Alert.alert('Success', 'Profile updated successfully', [{ text: 'OK' }]);

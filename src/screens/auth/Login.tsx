@@ -5,6 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useAuth } from '../../contexts/AuthContext';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 // import EnterImage from '@assets/images/enter.jpeg';
+import { track } from '@amplitude/analytics-react-native';
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -18,9 +19,11 @@ function Login(): React.JSX.Element {
   const { signIn } = useAuth();
   const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
   const EnterImage = require('./enter.jpeg')
+
   const handleLogin = async (username: string, password: string) => {
     try {
       await signIn(username, password);
+      track("Login Button")
     } catch (error) {
       Alert.alert('Login failed', 'Invalid username or password');
     }

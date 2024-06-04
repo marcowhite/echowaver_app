@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, RefreshControl } from 'react-native';
 import { Text, Card } from '@rneui/themed';
 import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import ProfileHeader from '../../../components/ProfileHeader';
@@ -23,32 +23,33 @@ function Profile(): React.JSX.Element {
   const { currentUser, refreshCurrentUser } = useUser();
   const { tracks, currentTrack, setCurrentTrack, setTracks } = usePlayer();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchProfileData = async () => {
+    if (!profile) return;
+
+    try {
+      const [songs, albums, followers, follows] = await Promise.all([
+        getSongsByUserId(profile.id),
+        getAlbumsByUserId(profile.id),
+        getUserFollowersById(profile.id),
+        getUserFollowsById(profile.id),
+      ]);
+
+      setSongs(songs);
+      setAlbums(albums);
+      setFollowers(followers);
+      setFollows(follows);
+
+      if (currentUser) {
+        setIsFollowing(followers.some((follower: { id: number; }) => follower.id === currentUser.id));
+      }
+    } catch (error) {
+      console.error('Failed to load profile data', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchProfileData = async () => {
-      if (!profile) return;
-
-      try {
-        const [songs, albums, followers, follows] = await Promise.all([
-          getSongsByUserId(profile.id),
-          getAlbumsByUserId(profile.id),
-          getUserFollowersById(profile.id),
-          getUserFollowsById(profile.id),
-        ]);
-
-        setSongs(songs);
-        setAlbums(albums);
-        setFollowers(followers);
-        setFollows(follows);
-
-        if (currentUser) {
-          setIsFollowing(followers.some((follower: { id: number; }) => follower.id === currentUser.id));
-        }
-      } catch (error) {
-        console.error('Failed to load profile data', error);
-      }
-    };
-
     fetchProfileData();
   }, [profile]);
 
@@ -78,12 +79,22 @@ function Profile(): React.JSX.Element {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchProfileData();
+    setRefreshing(false);
+  };
+
   if (!profile) {
     return <Text>Loading...</Text>;
   }
 
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <Card>
         <ProfileHeader
           user={profile}

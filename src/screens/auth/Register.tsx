@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { Input, Button, Text, Card } from '@rneui/themed';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { track } from '@amplitude/analytics-react-native';
 //import SignUpImage from '@assets/images/signup.jpeg';
 
 export type AuthStackParamList = {
@@ -45,6 +46,7 @@ function Register(): React.JSX.Element {
         Alert.alert('Registration Successful', 'You have been registered successfully!', [
           { text: 'OK', onPress: () => navigation.navigate('Login') },
         ]);
+        track("User Register")
       } else {
         const result = await response.json();
         Alert.alert('Registration Failed', result.message || 'Something went wrong!');
