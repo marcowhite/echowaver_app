@@ -3,11 +3,8 @@ import React from 'react';
 import Register from '../screens/auth/Register';
 import Login from '../screens/auth/Login';
 
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-const Tab = createBottomTabNavigator();
 
 const Stack = createNativeStackNavigator();
 

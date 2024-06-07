@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View, RefreshControl, TouchableOpacity, Image } from 'react-native';
-import { Button, Card, Text } from '@rneui/themed';
+import { ScrollView, StyleSheet, View, RefreshControl, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { Text } from '@rneui/themed';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { getSongs, getAlbums, getUserFollowsById, Song, Album, UserProfile, User } from '../../../api';
+import { getSongs, getAlbums, getUserFollowsById, Song, Album, UserProfile } from '../../../api';
 import { usePlayer } from '../../../contexts/PlayerContext';
 import { useLike } from '../../../contexts/LikeContext';
 import MiniPlayer from '../../../components/MiniPlayer';
 import SongsCard from '../../../components/SongsCard';
-import AlbumsCard from '../../../components/AlbumsCard';
 import FollowsCard from '../../../components/FollowsCard';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../../../contexts/UserContext';
 import { track } from '@amplitude/analytics-react-native';
 
@@ -21,17 +19,13 @@ export type RootStackParamList = {
   Library: undefined;
 };
 
-
-
 function Feed(): React.JSX.Element {
   const [songs, setSongs] = useState<Song[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [follows, setFollows] = useState<UserProfile[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const { tracks, currentTrack, setCurrentTrack, setTracks } = usePlayer();
-  const { likedSongs } = useLike();
-  const { currentUser } = useUser();
+  const { currentUser, refreshCurrentUser } = useUser();
 
   const fetchSongs = async () => {
     try {
@@ -64,12 +58,14 @@ function Feed(): React.JSX.Element {
   useEffect(() => {
     fetchSongs();
     fetchAlbums();
-    track("Opened Feed")
+    track("Opened Feed");
   }, []);
 
   useEffect(() => {
     if (currentUser) {
       fetchFollows();
+    } else {
+      refreshCurrentUser(); // Refresh user if not available
     }
   }, [currentUser]);
 
@@ -79,6 +75,8 @@ function Feed(): React.JSX.Element {
     await fetchAlbums();
     if (currentUser) {
       await fetchFollows();
+    } else {
+      await refreshCurrentUser(); // Refresh user if not available
     }
     setRefreshing(false);
   };
@@ -91,7 +89,7 @@ function Feed(): React.JSX.Element {
         }
         contentContainerStyle={styles.scrollViewContent}
       >
-        {currentUser && (
+        {currentUser ? (
           <View style={styles.profileContainer}>
             <TouchableOpacity
               style={styles.profileButton}
@@ -104,6 +102,8 @@ function Feed(): React.JSX.Element {
               <Text style={styles.profileButtonText}>{currentUser.display_name}</Text>
             </TouchableOpacity>
           </View>
+        ) : (
+          <ActivityIndicator size="large" color="#0000ff" />
         )}
         <SongsCard songs={songs} />
         {/* <AlbumsCard albums={albums} /> */}

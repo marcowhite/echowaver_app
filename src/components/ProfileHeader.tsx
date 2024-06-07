@@ -21,7 +21,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, followers, follows,
 
   return (
     <View style={styles.container}>
-      <Image source={user.avatar && user.avatar !== "null" ? { uri: `http://10.0.2.2:8000/file/image/${user.avatar}` } : DefaultUserImage} style={styles.avatar} />
+      <Image
+        source={user.avatar && user.avatar !== "null" && user.avatar !== "" ?
+          { uri: `http://10.0.2.2:8000/file/image/${user.avatar}` } :
+          DefaultUserImage}
+        style={styles.avatar}
+      />
       <View style={styles.infoContainer}>
         <Text style={styles.displayName}>{user.display_name}</Text>
         <Text style={styles.fullName}>

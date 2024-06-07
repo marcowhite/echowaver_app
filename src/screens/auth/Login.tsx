@@ -47,12 +47,7 @@ function Login(): React.JSX.Element {
         <Input leftIcon={<Ionicons size={24} name='mail' />} value={username} onChangeText={setUsername} placeholder="Email" />
         <Input leftIcon={<Ionicons size={24} name='key' />} value={password} secureTextEntry={!secure} onChangeText={setPassword} placeholder="Password" />
         <View style={styles.eyeIconContainer}>
-          <Ionicons
-            name={secure ? 'eye-off' : 'eye'}
-            size={24}
-            color="gray"
-            onPress={toggleSecure}
-          />
+          <Ionicons name={secure ? 'eye-off' : 'eye'} size={24} color="gray" onPress={toggleSecure} />
         </View>
         <Button onPress={() => handleLogin(username, password)} title="Login" />
         <Card.Divider />

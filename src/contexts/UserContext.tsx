@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, getCurrentUser } from '../api';
+import { Identify, identify, setUserId } from '@amplitude/analytics-react-native';
 
 interface UserContextType {
     currentUser: User | null;
@@ -18,6 +19,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const refreshedUser = await getCurrentUser();
             setCurrentUser(refreshedUser);
             await AsyncStorage.setItem('@current_user', JSON.stringify(refreshedUser));
+
         } catch (error) {
             console.error('Failed to refresh current user', error);
         }
@@ -30,6 +32,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 if (userData) {
                     const currentUser = JSON.parse(userData) as User;
                     setCurrentUser(currentUser);
+                }
+                else {
+                    await refreshCurrentUser(); // Refresh user if not in AsyncStorage
                 }
             } catch (error) {
                 console.error('Failed to fetch current user', error);
